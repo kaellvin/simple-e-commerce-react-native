@@ -1,4 +1,4 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
 
@@ -10,7 +10,7 @@ function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="home" color={color} />
+            <MaterialIcons size={24} name="home" color={color} />
           ),
         }}
       />
@@ -19,7 +19,7 @@ function TabLayout() {
         options={{
           title: "Cart",
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="shopping-cart" color={color} />
+            <MaterialIcons size={24} name="shopping-cart" color={color} />
           ),
         }}
       />
@@ -28,7 +28,7 @@ function TabLayout() {
         options={{
           title: "Account",
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="user-circle" color={color} />
+            <MaterialIcons size={24} name="account-circle" color={color} />
           ),
         }}
       />
