@@ -1,6 +1,7 @@
 import { globalStyles } from "@/styles/global";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -23,19 +24,21 @@ export const Divider = () => {
   return <View style={globalStyles.divider} />;
 };
 
-export default function Index() {
+export default function AccountScreen() {
   return (
     <SafeAreaView>
       <View>
         <View style={styles.imageContainer}>
           <Image
-            source={require("./../../assets/logos/company_logo.png")}
+            source={require("../../assets/logos/company_logo.png")}
             style={{ width: 200, height: 50 }}
             contentFit="contain"
           />
         </View>
+        <Link href="/sign-in">
+          <Info iconName="login" label="Sign In" />
+        </Link>
 
-        <Info iconName="login" label="Sign In" />
         {/* <Info iconName="logout" label="Sign Out" /> */}
         <Divider />
         <Info iconName="person-add" label="Sign Up" />
