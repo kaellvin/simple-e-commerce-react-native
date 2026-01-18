@@ -1,15 +1,5 @@
-import { Text, View } from "react-native";
+import Home from "@/src/screens";
 
-export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Home Page</Text>
-    </View>
-  );
+export default function homeScreen() {
+  return <Home />;
 }

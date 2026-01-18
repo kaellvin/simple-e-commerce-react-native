@@ -1,15 +1,6 @@
-import { Text, View } from "react-native";
+import Cart from "@/src/screens/cart";
+import React from "react";
 
-export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>CART PAGE</Text>
-    </View>
-  );
+export default function CartScreen() {
+  return <Cart />;
 }
