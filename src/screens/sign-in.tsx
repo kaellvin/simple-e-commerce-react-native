@@ -12,6 +12,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import LoadingOverlay from "../components/loading-overlay";
 
 const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_])[A-Za-z\d\W_]{10,}$/;
 
@@ -24,7 +25,7 @@ function SignIn() {
   const [passwordError, setPasswordError] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const { signIn } = useContext(AuthContext);
+  const { isLoading, signIn } = useContext(AuthContext);
   const { showToast } = useContext(ToastContext);
 
   const onSignInButtonClicked = async () => {
@@ -65,57 +66,62 @@ function SignIn() {
   };
 
   return (
-    <View style={{ margin: 16, gap: 16 }}>
-      <View>
-        <View style={styles.textInputContainer}>
-          <TextInput
-            onChangeText={setEmail}
-            value={email}
-            placeholder="Email"
-            keyboardType="email-address"
-            autoCorrect={false}
-            contextMenuHidden={true}
-            style={styles.textInput}
-          />
-        </View>
-        {emailError && <Text style={{ color: "red" }}>{emailError}</Text>}
-      </View>
-
-      <View>
-        <View
-          style={[
-            styles.textInputContainer,
-            { flexDirection: "row", alignItems: "center" },
-          ]}
-        >
-          <TextInput
-            onChangeText={setPassword}
-            value={password}
-            placeholder="Password"
-            secureTextEntry={!isPasswordVisible}
-            style={[styles.textInput, { flex: 1 }]}
-          />
-          <Pressable
-            onPress={() => {
-              setIsPasswordVisible((prev) => !prev);
-            }}
-          >
-            <MaterialIcons
-              size={24}
-              name={isPasswordVisible ? "visibility-off" : "visibility"}
+    <>
+      <View style={{ margin: 16, gap: 16 }}>
+        <View>
+          <View style={styles.textInputContainer}>
+            <TextInput
+              onChangeText={setEmail}
+              value={email}
+              placeholder="Email"
+              keyboardType="email-address"
+              autoCorrect={false}
+              contextMenuHidden={true}
+              style={styles.textInput}
             />
-          </Pressable>
+          </View>
+          {emailError && <Text style={{ color: "red" }}>{emailError}</Text>}
         </View>
 
-        {passwordError && <Text style={{ color: "red" }}>{passwordError}</Text>}
-      </View>
+        <View>
+          <View
+            style={[
+              styles.textInputContainer,
+              { flexDirection: "row", alignItems: "center" },
+            ]}
+          >
+            <TextInput
+              onChangeText={setPassword}
+              value={password}
+              placeholder="Password"
+              secureTextEntry={!isPasswordVisible}
+              style={[styles.textInput, { flex: 1 }]}
+            />
+            <Pressable
+              onPress={() => {
+                setIsPasswordVisible((prev) => !prev);
+              }}
+            >
+              <MaterialIcons
+                size={24}
+                name={isPasswordVisible ? "visibility-off" : "visibility"}
+              />
+            </Pressable>
+          </View>
 
-      <Button
-        label="Sign In"
-        variant="primary"
-        onPress={onSignInButtonClicked}
-      />
-    </View>
+          {passwordError && (
+            <Text style={{ color: "red" }}>{passwordError}</Text>
+          )}
+        </View>
+
+        <Button
+          label="Sign In"
+          variant="primary"
+          onPress={onSignInButtonClicked}
+        />
+      </View>
+      <LoadingOverlay visible={isLoading} />
+    </>
   );
 }
 

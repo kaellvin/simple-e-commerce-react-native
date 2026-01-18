@@ -12,11 +12,11 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
     });
 
+    setIsLoading(false);
+
     if (error) {
       throw new Error(error.message);
     }
-
-    setIsLoading(false);
   };
 
   return <AuthContext value={{ isLoading, signIn }}>{children}</AuthContext>;
