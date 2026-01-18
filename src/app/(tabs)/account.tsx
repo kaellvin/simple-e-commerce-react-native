@@ -30,7 +30,7 @@ export default function AccountScreen() {
       <View>
         <View style={styles.imageContainer}>
           <Image
-            source={require("../../assets/logos/company_logo.png")}
+            source={require("../../../assets/logos/company_logo.png")}
             style={{ width: 200, height: 50 }}
             contentFit="contain"
           />

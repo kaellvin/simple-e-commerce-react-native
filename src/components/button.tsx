@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/theme";
+import { Colors } from "@/src/constants/theme";
 import React from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
