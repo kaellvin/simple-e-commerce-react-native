@@ -1,8 +1,17 @@
 import { AuthContext } from "@/providers/AuthProvider";
+import { ToastContext } from "@/providers/ToastProvider";
 import Button from "@/src/components/button";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useContext, useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Keyboard,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_])[A-Za-z\d\W_]{10,}$/;
 
@@ -13,8 +22,10 @@ function SignIn() {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const { signIn } = useContext(AuthContext);
+  const { showToast } = useContext(ToastContext);
 
   const onSignInButtonClicked = async () => {
     let isError = false;
@@ -39,9 +50,16 @@ function SignIn() {
     }
 
     if (!isError) {
-      const success = await signIn(email, password);
-      if (success) {
+      Keyboard.dismiss();
+
+      try {
+        await signIn(email, password);
         router.back();
+        showToast("Login successfully.");
+      } catch (error) {
+        if (error instanceof Error) {
+          showToast(error.message);
+        }
       }
     }
   };
@@ -49,26 +67,46 @@ function SignIn() {
   return (
     <View style={{ margin: 16, gap: 16 }}>
       <View>
-        <TextInput
-          onChangeText={setEmail}
-          value={email}
-          placeholder="Email"
-          keyboardType="email-address"
-          autoCorrect={false}
-          contextMenuHidden={true}
-          style={styles.textInput}
-        />
+        <View style={styles.textInputContainer}>
+          <TextInput
+            onChangeText={setEmail}
+            value={email}
+            placeholder="Email"
+            keyboardType="email-address"
+            autoCorrect={false}
+            contextMenuHidden={true}
+            style={styles.textInput}
+          />
+        </View>
         {emailError && <Text style={{ color: "red" }}>{emailError}</Text>}
       </View>
 
       <View>
-        <TextInput
-          onChangeText={setPassword}
-          value={password}
-          placeholder="Password"
-          secureTextEntry={true}
-          style={styles.textInput}
-        />
+        <View
+          style={[
+            styles.textInputContainer,
+            { flexDirection: "row", alignItems: "center" },
+          ]}
+        >
+          <TextInput
+            onChangeText={setPassword}
+            value={password}
+            placeholder="Password"
+            secureTextEntry={!isPasswordVisible}
+            style={[styles.textInput, { flex: 1 }]}
+          />
+          <Pressable
+            onPress={() => {
+              setIsPasswordVisible((prev) => !prev);
+            }}
+          >
+            <MaterialIcons
+              size={24}
+              name={isPasswordVisible ? "visibility-off" : "visibility"}
+            />
+          </Pressable>
+        </View>
+
         {passwordError && <Text style={{ color: "red" }}>{passwordError}</Text>}
       </View>
 
@@ -84,9 +122,12 @@ function SignIn() {
 export default SignIn;
 
 const styles = StyleSheet.create({
-  textInput: {
+  textInputContainer: {
     borderWidth: 1,
     borderRadius: 8,
-    padding: 16,
+    padding: 8,
+  },
+  textInput: {
+    fontWeight: "semibold",
   },
 });
