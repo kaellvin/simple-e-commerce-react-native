@@ -1,15 +1,20 @@
-import { signIn } from "@/services/auth";
+import { AuthContext } from "@/providers/AuthProvider";
 import Button from "@/src/components/button";
-import React, { useState } from "react";
+import { useRouter } from "expo-router";
+import React, { useContext, useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
 const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_])[A-Za-z\d\W_]{10,}$/;
 
 function SignIn() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  const { signIn } = useContext(AuthContext);
 
   const onSignInButtonClicked = async () => {
     let isError = false;
@@ -34,7 +39,10 @@ function SignIn() {
     }
 
     if (!isError) {
-      await signIn(email, password);
+      const success = await signIn(email, password);
+      if (success) {
+        router.back();
+      }
     }
   };
 
@@ -46,6 +54,8 @@ function SignIn() {
           value={email}
           placeholder="Email"
           keyboardType="email-address"
+          autoCorrect={false}
+          contextMenuHidden={true}
           style={styles.textInput}
         />
         {emailError && <Text style={{ color: "red" }}>{emailError}</Text>}
