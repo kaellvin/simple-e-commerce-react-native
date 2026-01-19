@@ -2,21 +2,15 @@ import Button from "@/src/components/button";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  Keyboard,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Keyboard, Pressable, StyleSheet, Text, View } from "react-native";
+import AppTextInput from "../components/app-text-input";
 import LoadingOverlay from "../components/loading-overlay";
 import useAuth from "../hooks/useAuth";
 import useToast from "../hooks/useToast";
 
 const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_])[A-Za-z\d\W_]{10,}$/;
 
-function SignIn() {
+export default function SignIn() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
@@ -70,14 +64,14 @@ function SignIn() {
       <View style={{ margin: 16, gap: 16 }}>
         <View>
           <View style={styles.textInputContainer}>
-            <TextInput
+            <AppTextInput
               onChangeText={setEmail}
               value={email}
               placeholder="Email"
               keyboardType="email-address"
               autoCorrect={false}
               contextMenuHidden={true}
-              style={styles.textInput}
+              variant="bodyLarge"
             />
           </View>
           {emailError && <Text style={{ color: "red" }}>{emailError}</Text>}
@@ -90,12 +84,13 @@ function SignIn() {
               { flexDirection: "row", alignItems: "center" },
             ]}
           >
-            <TextInput
+            <AppTextInput
               onChangeText={setPassword}
               value={password}
               placeholder="Password"
               secureTextEntry={!isPasswordVisible}
-              style={[styles.textInput, { flex: 1 }]}
+              style={{ flex: 1 }}
+              variant="bodyLarge"
             />
             <Pressable
               onPress={() => {
@@ -125,15 +120,10 @@ function SignIn() {
   );
 }
 
-export default SignIn;
-
 const styles = StyleSheet.create({
   textInputContainer: {
     borderWidth: 1,
     borderRadius: 8,
     padding: 8,
-  },
-  textInput: {
-    fontWeight: "semibold",
   },
 });

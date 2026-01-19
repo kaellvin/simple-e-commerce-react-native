@@ -2,8 +2,9 @@ import { globalStyles } from "@/styles/global";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AppText from "../components/app-text";
 import useAuth from "../hooks/useAuth";
 import useToast from "../hooks/useToast";
 
@@ -33,9 +34,9 @@ export default function Account() {
           />
         </View>
         {session && (
-          <Text style={[styles.infoText, { padding: 8 }]}>
+          <AppText variant="titleMedium" style={{ padding: 8 }}>
             Logged in as: {session.user.email}
-          </Text>
+          </AppText>
         )}
         {session ? (
           <Pressable onPress={onSignOutLabelClicked}>
@@ -63,7 +64,7 @@ export default function Account() {
   );
 }
 
-export const Info = ({
+const Info = ({
   iconName,
   label,
 }: {
@@ -73,12 +74,12 @@ export const Info = ({
   return (
     <View style={styles.infoContainer}>
       <MaterialIcons size={24} name={iconName} />
-      <Text style={styles.infoText}>{label}</Text>
+      <AppText variant="titleMedium">{label}</AppText>
     </View>
   );
 };
 
-export const Divider = () => {
+const Divider = () => {
   return <View style={globalStyles.divider} />;
 };
 
@@ -93,9 +94,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 16,
     padding: 8,
-  },
-  infoText: {
-    fontSize: 16,
-    fontWeight: 500,
   },
 });
