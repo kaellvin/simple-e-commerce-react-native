@@ -1,9 +1,7 @@
-import { AuthContext } from "@/providers/AuthProvider";
-import { ToastContext } from "@/providers/ToastProvider";
 import Button from "@/src/components/button";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
   Keyboard,
   Pressable,
@@ -13,6 +11,8 @@ import {
   View,
 } from "react-native";
 import LoadingOverlay from "../components/loading-overlay";
+import useAuth from "../hooks/useAuth";
+import useToast from "../hooks/useToast";
 
 const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_])[A-Za-z\d\W_]{10,}$/;
 
@@ -25,8 +25,8 @@ function SignIn() {
   const [passwordError, setPasswordError] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const { isLoading, signIn } = useContext(AuthContext);
-  const { showToast } = useContext(ToastContext);
+  const { isLoading, signIn } = useAuth();
+  const { showToast } = useToast();
 
   const onSignInButtonClicked = async () => {
     let isError = false;

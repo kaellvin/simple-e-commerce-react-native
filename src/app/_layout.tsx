@@ -17,6 +17,12 @@ export default function RootLayout() {
                 title: "Sign In",
               }}
             />
+            <Stack.Screen
+              name="sign-up"
+              options={{
+                title: "Sign Up",
+              }}
+            />
           </Stack>
         </SafeAreaProvider>
       </ToastProvider>

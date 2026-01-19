@@ -2,10 +2,26 @@ import { globalStyles } from "@/styles/global";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import useAuth from "../hooks/useAuth";
+import useToast from "../hooks/useToast";
 
 export default function Account() {
+  const { session, signOut } = useAuth();
+  const { showToast } = useToast();
+
+  const onSignOutLabelClicked = async () => {
+    try {
+      await signOut();
+      showToast("Sign out successfully.");
+    } catch (error) {
+      if (error instanceof Error) {
+        showToast(error.message);
+      }
+    }
+  };
+
   return (
     <SafeAreaView>
       <View>
@@ -16,14 +32,31 @@ export default function Account() {
             contentFit="contain"
           />
         </View>
-        <Link href="/sign-in">
-          <Info iconName="login" label="Sign In" />
-        </Link>
+        {session && (
+          <Text style={[styles.infoText, { padding: 8 }]}>
+            Logged in as: {session.user.email}
+          </Text>
+        )}
+        {session ? (
+          <Pressable onPress={onSignOutLabelClicked}>
+            <Info iconName="logout" label="Sign Out" />
+          </Pressable>
+        ) : (
+          <Link href="/sign-in">
+            <Info iconName="login" label="Sign In" />
+          </Link>
+        )}
 
-        {/* <Info iconName="logout" label="Sign Out" /> */}
         <Divider />
-        <Info iconName="person-add" label="Sign Up" />
-        <Divider />
+        {!session && (
+          <>
+            <Link href="/sign-up">
+              <Info iconName="person-add" label="Sign Up" />
+            </Link>
+
+            <Divider />
+          </>
+        )}
         <Info iconName="info" label="About App" />
       </View>
     </SafeAreaView>

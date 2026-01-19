@@ -1,9 +1,9 @@
 import React, { createContext, useState } from "react";
 import { StyleSheet, Text } from "react-native";
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
@@ -51,9 +51,7 @@ interface IToastContext {
   showToast: (message: string) => void;
 }
 
-export const ToastContext = createContext<IToastContext>({
-  showToast: () => console.warn("showToast must be used within provider"),
-});
+export const ToastContext = createContext<IToastContext | undefined>(undefined);
 
 export default ToastProvider;
 
