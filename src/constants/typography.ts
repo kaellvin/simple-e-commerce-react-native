@@ -1,6 +1,12 @@
 import { StyleSheet } from "react-native";
 
 export const Typography = StyleSheet.create({
+  titleLarge: {
+    fontSize: 22,
+    fontWeight: "400",
+    lineHeight: 28,
+    letterSpacing: 0,
+  },
   titleMedium: {
     fontSize: 16,
     fontWeight: "500",

@@ -53,7 +53,12 @@ export default function Home() {
         // keyExtractor={(_, index) => index.toString()}
         contentContainerStyle={{ padding: contentPadding }}
         renderItem={({ item }) => (
-          <Link href="/product-detail">
+          <Link
+            href={{
+              pathname: "/product-detail/[id]",
+              params: { id: item.id },
+            }}
+          >
             <HomeItem
               product={item}
               itemWidth={itemWidth}
