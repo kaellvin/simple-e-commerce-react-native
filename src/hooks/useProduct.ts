@@ -9,7 +9,7 @@ function useProduct() {
 
   const getProductDetail = useCallback(async (id: string) => {
     try {
-      setIsLoading(false);
+      setIsLoading(true);
       const product = await getProduct(id);
       setProduct(product);
     } catch (error) {

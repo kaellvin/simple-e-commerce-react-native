@@ -101,7 +101,7 @@ const HomeItem = ({
     >
       <Image
         source={product.imageUrl}
-        style={{ aspectRatio: 1, backgroundColor: "blue" }}
+        style={{ aspectRatio: 1 }}
         contentFit="contain"
       />
       <View style={{ flex: 1, justifyContent: "space-between" }}>

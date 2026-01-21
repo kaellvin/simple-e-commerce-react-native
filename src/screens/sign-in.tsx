@@ -109,11 +109,9 @@ export default function SignIn() {
           )}
         </View>
 
-        <Button
-          label="Sign In"
-          variant="primary"
-          onPress={onSignInButtonClicked}
-        />
+        <Button variant="primary" onPress={onSignInButtonClicked}>
+          Sign In
+        </Button>
       </View>
       <LoadingOverlay visible={isLoading} />
     </>

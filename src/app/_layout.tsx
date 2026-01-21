@@ -27,7 +27,7 @@ export default function RootLayout() {
               name="product-detail/[id]"
               options={{
                 title: "Product-detail",
-                // headerShown: false,
+                headerShown: false,
               }}
             />
           </Stack>
