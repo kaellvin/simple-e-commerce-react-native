@@ -15,7 +15,7 @@ function useProduct() {
   const [activeVariant, setActiveVariant] = useState<ProductVariant>(
     EMPTY_PRODUCT_VARIANT,
   );
-  const [pvOptionList, setPvOptionList] = useState<PVOption[]>([]);
+  const [pvOptionList, setPVOptionList] = useState<PVOption[]>([]);
   const [mainImageUrl, setMainImageUrl] = useState("");
   const [quantity, setQuantity] = useState(1);
 
@@ -34,7 +34,7 @@ function useProduct() {
           defaultVariant,
         );
         setActiveVariant(defaultVariant);
-        setPvOptionList(pvOptionList);
+        setPVOptionList(pvOptionList);
         setMainImageUrl(optionValueImage.url);
       }
 
@@ -205,14 +205,6 @@ function useProduct() {
   //--
   const getCurrentPrice = () => Number(activeVariant.price) * quantity;
 
-  const onQuantityIncrease = () => {
-    setQuantity((prev) => (prev < activeVariant.quantity ? prev + 1 : prev));
-  };
-
-  const onQuantityDecrease = () => {
-    setQuantity((prev) => prev - 1);
-  };
-
   return {
     isLoading,
     error,
@@ -221,9 +213,11 @@ function useProduct() {
     mainImageUrl,
     activeVariant,
     getCurrentPrice,
+    pvOptionList,
+    setActiveVariant,
+    setPVOptionList,
     quantity,
-    onQuantityDecrease,
-    onQuantityIncrease,
+    setQuantity,
   };
 }
 
