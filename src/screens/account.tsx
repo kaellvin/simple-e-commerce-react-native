@@ -1,10 +1,10 @@
-import { globalStyles } from "@/styles/global";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AppText from "../components/app-text";
+import Divider from "../components/divider";
 import useAuth from "../hooks/useAuth";
 import useToast from "../hooks/useToast";
 
@@ -77,10 +77,6 @@ const Info = ({
       <AppText variant="titleMedium">{label}</AppText>
     </View>
   );
-};
-
-const Divider = () => {
-  return <View style={globalStyles.divider} />;
 };
 
 const styles = StyleSheet.create({

@@ -113,7 +113,7 @@ const HomeItem = ({
           {product.name}
         </AppText>
         <AppText style={{ padding: 8 }} variant="labelLarge">
-          {`RM ` + Number(product.price).toFixed(2)}
+          {`RM  ${Number(product.price).toFixed(2)}`}
         </AppText>
       </View>
     </View>

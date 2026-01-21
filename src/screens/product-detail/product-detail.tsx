@@ -1,6 +1,12 @@
+import Divider from "@/src/components/divider";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   FlatList,
   NativeScrollEvent,
@@ -10,22 +16,38 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import AppText from "../components/app-text";
-import Button from "../components/button";
-import CenteredMessage from "../components/centered-message";
-import CircularIcon from "../components/circular-icon";
-import LoadingIndicator from "../components/loading-indicator";
-import useProduct from "../hooks/useProduct";
+import AppText from "../../components/app-text";
+import Button from "../../components/button";
+import CenteredMessage from "../../components/centered-message";
+import CircularIcon from "../../components/circular-icon";
+import LoadingIndicator from "../../components/loading-indicator";
+import useProduct from "../../hooks/useProduct";
+import QuantityControl from "./quantity-control";
 
 export default function ProductDetail() {
   const { id: productId } = useLocalSearchParams<{ id: string }>();
-  const { isLoading, error, product, getProductDetail } = useProduct();
+  const {
+    isLoading,
+    error,
+    product,
+    getProductDetail,
+    activeVariant,
+    getCurrentPrice,
+    mainImageUrl,
+    quantity,
+    onQuantityDecrease,
+    onQuantityIncrease,
+  } = useProduct();
 
   const { width } = useWindowDimensions();
   const inset = useSafeAreaInsets();
   const router = useRouter();
 
+  //page indicator
   const [pageNum, setPageNum] = useState(0);
+
+  //bottom sheet
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   useEffect(() => {
     getProductDetail(productId);
@@ -45,7 +67,22 @@ export default function ProductDetail() {
     setPageNum(pageNum);
   };
 
-  const onAddToCartButtonClicked = () => {};
+  const onAddToCartButtonClicked = () => {
+    bottomSheetRef.current?.expand();
+  };
+
+  //--
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  );
 
   if (isLoading) return <LoadingIndicator />;
 
@@ -127,6 +164,53 @@ export default function ProductDetail() {
           </Button>
         </View>
       </ScrollView>
+
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        backdropComponent={renderBackdrop}
+      >
+        <BottomSheetView>
+          <View style={{ padding: 16, gap: 16 }}>
+            <View style={{ flexDirection: "row", gap: 8 }}>
+              <Image
+                source={mainImageUrl}
+                style={{ aspectRatio: 1, width: width * 0.3, borderRadius: 16 }}
+                contentFit="contain"
+              />
+              <View>
+                <AppText variant="labelLarge">
+                  {`Price: RM ${getCurrentPrice().toFixed(2)}`}
+                </AppText>
+                <AppText variant="labelLarge">{`Stock: ${activeVariant.quantity}`}</AppText>
+              </View>
+            </View>
+
+            <Divider />
+            <Divider />
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <AppText variant="labelLarge">Quantity</AppText>
+
+              <QuantityControl
+                onDecrease={onQuantityDecrease}
+                onIncrease={onQuantityIncrease}
+                quantity={quantity}
+                stock={activeVariant.quantity}
+              />
+            </View>
+
+            <Button variant="primary" onPress={() => {}}>
+              Add To Cart
+            </Button>
+          </View>
+        </BottomSheetView>
+      </BottomSheet>
     </View>
   );
 }

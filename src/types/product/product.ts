@@ -151,3 +151,24 @@ export interface OptionValueImage {
   url: string;
   optionValueId: string;
 }
+
+//--
+export interface PVOption {
+  readonly id: string;
+  readonly name: string;
+  readonly publicLabel: string;
+  values: SelectablePVOptionValue[];
+}
+
+export interface SelectablePVOptionValue {
+  readonly imageUrl: string;
+  readonly optionValue: PVOptionValue;
+  readonly isSelected: boolean;
+  readonly isWithinSelection: boolean;
+}
+
+export interface PVOptionValue {
+  readonly id: string;
+  readonly name: string;
+  readonly position: number;
+}
