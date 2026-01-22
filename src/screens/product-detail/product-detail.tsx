@@ -21,8 +21,8 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AppButton from "../../components/app-button";
 import AppText from "../../components/app-text";
-import Button from "../../components/button";
 import CenteredMessage from "../../components/centered-message";
 import CircularIcon from "../../components/circular-icon";
 import LoadingIndicator from "../../components/loading-indicator";
@@ -270,9 +270,9 @@ export default function ProductDetail() {
               <AppText variant="bodyLarge">{product.description}</AppText>
             </View>
 
-            <Button variant="primary" onPress={onAddToCartButtonClicked}>
+            <AppButton variant="primary" onPress={onAddToCartButtonClicked}>
               Add To Cart
-            </Button>
+            </AppButton>
           </View>
         </ScrollView>
 
@@ -287,8 +287,8 @@ export default function ProductDetail() {
                 <Image
                   source={mainImageUrl}
                   style={{
-                    aspectRatio: 1,
                     width: width * 0.3,
+                    aspectRatio: 1,
                     borderRadius: 16,
                   }}
                   contentFit="contain"
@@ -379,12 +379,12 @@ export default function ProductDetail() {
                 />
               </View>
 
-              <Button
+              <AppButton
                 variant="primary"
                 onPress={onBottomSheetAddToCartButtonClicked}
               >
                 Add To Cart
-              </Button>
+              </AppButton>
             </View>
           </BottomSheetView>
         </BottomSheet>

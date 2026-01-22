@@ -1,8 +1,10 @@
+import useCart from "@/src/hooks/useCart";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
 
 function TabLayout() {
+  const { cartItemCount } = useCart();
   return (
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
@@ -21,6 +23,7 @@ function TabLayout() {
           tabBarIcon: ({ color }) => (
             <MaterialIcons size={24} name="shopping-cart" color={color} />
           ),
+          tabBarBadge: cartItemCount <= 0 ? undefined : cartItemCount,
         }}
       />
       <Tabs.Screen

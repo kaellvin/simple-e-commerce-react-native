@@ -82,7 +82,7 @@ const toOption = (dto: OptionDto): Option => ({
   publicLabel: dto.publicLabel,
 });
 
-const toProductOption = (dto: ProductOptionDto): ProductOption => ({
+export const toProductOption = (dto: ProductOptionDto): ProductOption => ({
   optionId: dto.optionId,
   position: dto.position,
 });

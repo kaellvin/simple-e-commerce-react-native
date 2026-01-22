@@ -1,20 +1,37 @@
 import { Colors } from "@/src/constants/theme";
 import React from "react";
-import { Pressable, StyleSheet, Text, TextProps } from "react-native";
+import {
+  Pressable,
+  PressableProps,
+  StyleSheet,
+  Text,
+  TextProps,
+} from "react-native";
 
 type ButtonVariant = "primary" | "secondary";
 
-interface ButtonProps extends TextProps {
+interface ButtonProps extends PressableProps {
   children: React.ReactNode;
   variant: ButtonVariant;
-  onPress: () => void;
+  onPress?: () => void;
+  textProps?: TextProps;
 }
 
-function Button({ children, variant, onPress, ...props }: ButtonProps) {
-  const backgroundColor =
-    variant === "primary" ? Colors.light.primary : Colors.light.secondary;
+function AppButton({
+  children,
+  variant,
+  onPress,
+  textProps,
+  ...props
+}: ButtonProps) {
+  const backgroundColor = props.disabled
+    ? "gray"
+    : variant === "primary"
+      ? Colors.light.primary
+      : Colors.light.secondary;
   return (
     <Pressable
+      {...props}
       onPress={onPress}
       style={({ pressed }) => [
         styles.container,
@@ -22,14 +39,14 @@ function Button({ children, variant, onPress, ...props }: ButtonProps) {
         { opacity: pressed ? 0.6 : 1 },
       ]}
     >
-      <Text {...props} style={styles.buttonText}>
+      <Text style={styles.buttonText} numberOfLines={1} {...textProps}>
         {children}
       </Text>
     </Pressable>
   );
 }
 
-export default Button;
+export default AppButton;
 
 const styles = StyleSheet.create({
   container: {

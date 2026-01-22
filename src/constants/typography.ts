@@ -31,6 +31,12 @@ export const Typography = StyleSheet.create({
     lineHeight: 20,
     letterSpacing: 0.1,
   },
+  labelMedium: {
+    fontSize: 12,
+    fontWeight: "500",
+    lineHeight: 16,
+    letterSpacing: 0.5,
+  },
 });
 
 export type TypographyVariant = keyof typeof Typography;

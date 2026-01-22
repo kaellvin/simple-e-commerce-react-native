@@ -1,4 +1,4 @@
-import Button from "@/src/components/button";
+import AppButton from "@/src/components/app-button";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -109,9 +109,9 @@ export default function SignIn() {
           )}
         </View>
 
-        <Button variant="primary" onPress={onSignInButtonClicked}>
+        <AppButton variant="primary" onPress={onSignInButtonClicked}>
           Sign In
-        </Button>
+        </AppButton>
       </View>
       <LoadingOverlay visible={isLoading} />
     </>

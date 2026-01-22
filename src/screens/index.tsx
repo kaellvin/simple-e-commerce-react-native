@@ -43,6 +43,7 @@ export default function Home() {
   return (
     <SafeAreaView>
       <SearchBar />
+
       <FlatList
         data={products}
         numColumns={numColumns}
