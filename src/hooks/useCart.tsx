@@ -1,12 +1,135 @@
 import { Session } from "@supabase/supabase-js";
 import { debounce, DebouncedFunc } from "lodash";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import { deleteCartItem, getCart, updateCartItems } from "../api/cart/cart.api";
 import { Cart, CartItemUpdate } from "../types/cart/cart";
 import useAuth from "./useAuth";
 import useToast from "./useToast";
 
 type DebouncedFuncForCartItemUpdate = DebouncedFunc<() => Promise<void>> | null;
+
+export enum CartStatus {
+  Initial,
+  Loading,
+  Updating,
+  Refreshing,
+  Success,
+  Failure,
+}
+
+type CartState = {
+  status: CartStatus;
+  cart: Cart | null;
+};
+
+type CartAction =
+  | { type: "loadInProgress" }
+  | { type: "refreshInProgress" }
+  | { type: "updateInProgress" }
+  | { type: "loadSuccess"; payload: Cart | null }
+  | { type: "updateSuccess"; payload: Cart | null }
+  | {
+      type: "checkboxToggled";
+      payload: { isChecked: boolean; productVariantId: string };
+    }
+  | {
+      type: "updateQuantity";
+      payload: { newQuantity: number; productVariantId: string };
+    }
+  | {
+      type: "restoreQuantity";
+      payload: Map<string, number>;
+    };
+
+const initialState: CartState = {
+  status: CartStatus.Initial,
+  cart: null,
+};
+
+const cartReducer = (state: CartState, action: CartAction): CartState => {
+  switch (action.type) {
+    case "loadInProgress":
+      return { ...state, status: CartStatus.Loading };
+    case "refreshInProgress":
+      return { ...state, status: CartStatus.Refreshing };
+    case "updateInProgress":
+      return { ...state, status: CartStatus.Updating };
+    case "loadSuccess":
+      return { ...state, status: CartStatus.Success, cart: action.payload };
+    case "updateSuccess":
+      return { ...state, cart: action.payload };
+    case "checkboxToggled":
+      return {
+        ...state,
+        cart:
+          state.cart === null
+            ? null
+            : {
+                ...state.cart,
+                cartItemAndSelections: state.cart.cartItemAndSelections.map(
+                  (item) => ({
+                    ...item,
+                    isChecked:
+                      item.cartItem.productVariantId ===
+                      action.payload.productVariantId
+                        ? action.payload.isChecked
+                        : item.isChecked,
+                  }),
+                ),
+              },
+      };
+    case "updateQuantity":
+      return {
+        ...state,
+        cart:
+          state.cart === null
+            ? null
+            : {
+                ...state.cart,
+                cartItemAndSelections: [
+                  ...state.cart.cartItemAndSelections.map((item) => ({
+                    ...item,
+                    cartItem:
+                      item.cartItem.productVariantId ===
+                      action.payload.productVariantId
+                        ? {
+                            ...item.cartItem,
+                            quantity: action.payload.newQuantity,
+                          }
+                        : item.cartItem,
+                  })),
+                ],
+              },
+      };
+    case "restoreQuantity":
+      let prevCartItemQuantityMap = action.payload;
+      return {
+        ...state,
+        cart:
+          state.cart === null
+            ? null
+            : {
+                ...state.cart,
+                cartItemAndSelections: [
+                  ...state.cart.cartItemAndSelections.map((item) => {
+                    let productVariantId = item.cartItem.productVariantId;
+                    if (prevCartItemQuantityMap.has(productVariantId)) {
+                      return {
+                        ...item,
+                        cartItem: {
+                          ...item.cartItem,
+                          quantity:
+                            prevCartItemQuantityMap.get(productVariantId)!,
+                        },
+                      };
+                    }
+                    return { ...item };
+                  }),
+                ],
+              },
+      };
+  }
+};
 
 function useCart() {
   const { session } = useAuth();
@@ -19,9 +142,7 @@ function useCart() {
   const debouncedCartItemUpdateRef =
     useRef<DebouncedFuncForCartItemUpdate>(null);
 
-  const [cart, setCart] = useState<Cart | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [state, dispatch] = useReducer(cartReducer, initialState);
 
   //optimistic update(experimental)
   // const [optimisticCart, updateOptimisticCart] = useOptimistic<
@@ -81,20 +202,18 @@ function useCart() {
     { isRefresh = false }: { isRefresh?: boolean },
   ) => {
     try {
-      if (!isRefresh) {
-        setIsLoading(true);
+      if (isRefresh) {
+        dispatch({ type: "refreshInProgress" });
+      } else {
+        dispatch({ type: "loadInProgress" });
       }
 
       const accessToken = session.access_token;
       const cart = await getCart(accessToken);
-      setCart(cart);
+      dispatch({ type: "loadSuccess", payload: cart });
     } catch (error) {
       if (error instanceof Error) {
         console.log(error.message);
-      }
-    } finally {
-      if (!isRefresh) {
-        setIsLoading(false);
       }
     }
   };
@@ -104,7 +223,7 @@ function useCart() {
     quantity: number,
     productVariantId: string,
   ) => {
-    if (!cart || !session || !debouncedCartItemUpdateRef.current) return;
+    if (!state.cart || !session || !debouncedCartItemUpdateRef.current) return;
 
     _updateCartItemQuantity(newQuantity, productVariantId);
 
@@ -113,7 +232,7 @@ function useCart() {
       newQuantity: newQuantity,
       quantity: quantity,
       productVariantId: productVariantId,
-      cartId: cart.id,
+      cartId: state.cart.id,
     });
 
     //keep old quantity as fallback
@@ -129,50 +248,16 @@ function useCart() {
     newQuantity: number,
     productVariantId: string,
   ) => {
-    setCart((prevCart) => {
-      if (prevCart === null) return null;
-      return {
-        ...prevCart,
-        cartItemAndSelections: [
-          ...prevCart.cartItemAndSelections.map((item) => ({
-            ...item,
-            cartItem:
-              item.cartItem.productVariantId === productVariantId
-                ? {
-                    ...item.cartItem,
-                    quantity: newQuantity,
-                  }
-                : item.cartItem,
-          })),
-        ],
-      };
+    dispatch({
+      type: "updateQuantity",
+      payload: { newQuantity: newQuantity, productVariantId: productVariantId },
     });
   };
 
   const _restoreCartItemQuantity = () => {
     let prevCartItemQuantityMap = prevCartItemQuantityMapRef.current;
 
-    setCart((prevCart) => {
-      if (prevCart === null) return null;
-      return {
-        ...prevCart,
-        cartItemAndSelections: [
-          ...prevCart.cartItemAndSelections.map((item) => {
-            let productVariantId = item.cartItem.productVariantId;
-            if (prevCartItemQuantityMap.has(productVariantId)) {
-              return {
-                ...item,
-                cartItem: {
-                  ...item.cartItem,
-                  quantity: prevCartItemQuantityMap.get(productVariantId)!,
-                },
-              };
-            }
-            return { ...item };
-          }),
-        ],
-      };
-    });
+    dispatch({ type: "restoreQuantity", payload: prevCartItemQuantityMap });
 
     //reset
     prevCartItemQuantityMapRef.current.clear();
@@ -180,15 +265,16 @@ function useCart() {
   };
 
   const deleteCartItemFromCart = async (productVariantId: string) => {
-    if (!cart || !session) return;
+    if (!state.cart || !session) return;
 
     try {
+      dispatch({ type: "updateInProgress" });
       const newCart = await deleteCartItem(
         session.access_token,
-        cart.id,
+        state.cart.id,
         productVariantId,
       );
-      setCart(newCart);
+      dispatch({ type: "updateSuccess", payload: newCart });
       showToast("Cart item removed successfully.");
     } catch (error) {
       if (error instanceof Error) {
@@ -200,18 +286,22 @@ function useCart() {
   const onRefresh = async () => {
     if (!session) return;
 
-    setRefreshing(true);
     await getCartDetail(session, { isRefresh: true });
-    setRefreshing(false);
+
     showToast("Updated Information.");
   };
 
+  const onCheckboxChange = (isChecked: boolean, productVariantId: string) => {
+    dispatch({
+      type: "checkboxToggled",
+      payload: { isChecked: isChecked, productVariantId: productVariantId },
+    });
+  };
+
   return {
-    isLoading,
-    refreshing,
-    cart,
-    cartItemCount: cart?.cartItemAndSelections.length ?? 0,
-    setCart,
+    state,
+    cartItemCount: state.cart?.cartItemAndSelections.length ?? 0,
+    onCheckboxChange,
     updateQuantity,
     deleteCartItemFromCart,
     onRefresh,

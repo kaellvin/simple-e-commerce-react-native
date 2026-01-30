@@ -3,7 +3,13 @@ import { Checkbox } from "expo-checkbox";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { FlatList, Pressable, useWindowDimensions, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  ScrollView,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { RefreshControl } from "react-native-gesture-handler";
 import ReanimatedSwipeable, {
   SwipeableMethods,
@@ -15,8 +21,9 @@ import AppModal from "../components/app-modal";
 import AppText from "../components/app-text";
 import CenteredMessage from "../components/centered-message";
 import LoadingIndicator from "../components/loading-indicator";
+import LoadingOverlay from "../components/loading-overlay";
 import useAuth from "../hooks/useAuth";
-import useCart from "../hooks/useCart";
+import useCart, { CartStatus } from "../hooks/useCart";
 import {
   CartItem,
   CartItemAndSelection,
@@ -26,10 +33,8 @@ import {
 export default function Cart() {
   const { session } = useAuth();
   const {
-    isLoading,
-    refreshing,
-    cart,
-    setCart,
+    state: cartState,
+    onCheckboxChange,
     updateQuantity,
     deleteCartItemFromCart,
     onRefresh,
@@ -40,7 +45,7 @@ export default function Cart() {
   const { width } = useWindowDimensions();
 
   const cartTotal =
-    cart?.cartItemAndSelections
+    cartState.cart?.cartItemAndSelections
       .filter((item) => item.isChecked)
       .reduce(
         (sum, item) =>
@@ -48,23 +53,6 @@ export default function Cart() {
           Number(item.cartItem.productVariant.price) * item.cartItem.quantity,
         0,
       ) ?? 0;
-
-  const onCheckboxChange = (isChecked: boolean, productVariantId: string) => {
-    setCart((prev) => {
-      if (!prev) return prev;
-
-      return {
-        ...prev,
-        cartItemAndSelections: prev.cartItemAndSelections.map((item) => ({
-          ...item,
-          isChecked:
-            item.cartItem.productVariantId === productVariantId
-              ? isChecked
-              : item.isChecked,
-        })),
-      };
-    });
-  };
 
   const onRemoveIconClicked = (cartItem: CartItem) => {
     let newQuantity = cartItem.quantity - 1;
@@ -269,21 +257,34 @@ export default function Cart() {
       </View>
     );
 
-  if (isLoading) return <LoadingIndicator />;
+  if (cartState.status === CartStatus.Loading) return <LoadingIndicator />;
 
-  return cart === null ? (
-    <CenteredMessage message="Your cart is empty" />
+  return cartState.cart === null ? (
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      refreshControl={
+        <RefreshControl
+          refreshing={cartState.status === CartStatus.Refreshing}
+          onRefresh={onRefresh}
+        />
+      }
+    >
+      <CenteredMessage message="Your cart is empty." />
+    </ScrollView>
   ) : (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
         <FlatList
-          data={cart.cartItemAndSelections}
+          data={cartState.cart.cartItemAndSelections}
           renderItem={renderItem}
           ListEmptyComponent={() => (
-            <CenteredMessage message="Your cart is empty" />
+            <CenteredMessage message="Your cart is empty." />
           )}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            <RefreshControl
+              refreshing={cartState.status === CartStatus.Refreshing}
+              onRefresh={onRefresh}
+            />
           }
         />
         <View style={{ marginHorizontal: 16 }}>
@@ -313,6 +314,7 @@ export default function Cart() {
         }
         buttonLabel="OK"
       />
+      <LoadingOverlay visible={cartState.status === CartStatus.Updating} />
     </SafeAreaView>
   );
 }
