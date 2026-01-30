@@ -119,3 +119,27 @@ export interface CartOptionValue {
 export interface CartOption {
   readonly id: string;
 }
+
+//-- FOR POST/PATCH ACTION
+export interface CartItemUpdate {
+  readonly newQuantity: number;
+  readonly quantity: number;
+  readonly productVariantId: string;
+  readonly cartId: string;
+}
+
+export interface CartItemUpdateRequest {
+  readonly quantity: number;
+  readonly productVariantId: string;
+  readonly cartId: string;
+}
+
+//-- DELETE ACTION
+export interface RemoveItemAlertState {
+  productVariantId: string;
+  isOpen: boolean;
+}
+
+export interface DELETECartItemResponse extends CartResponse<Cart | null> {
+  message: string;
+}

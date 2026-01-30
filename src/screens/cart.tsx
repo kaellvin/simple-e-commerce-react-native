@@ -2,6 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Checkbox } from "expo-checkbox";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
+import { useState } from "react";
 import { FlatList, Pressable, useWindowDimensions, View } from "react-native";
 import ReanimatedSwipeable, {
   SwipeableMethods,
@@ -9,16 +10,24 @@ import ReanimatedSwipeable, {
 import { SharedValue } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AppButton from "../components/app-button";
+import AppModal from "../components/app-modal";
 import AppText from "../components/app-text";
 import CenteredMessage from "../components/centered-message";
 import LoadingIndicator from "../components/loading-indicator";
 import useAuth from "../hooks/useAuth";
 import useCart from "../hooks/useCart";
-import { CartItemAndSelection } from "../types/cart/cart";
+import {
+  CartItem,
+  CartItemAndSelection,
+  RemoveItemAlertState,
+} from "../types/cart/cart";
 
 export default function Cart() {
   const { session } = useAuth();
-  const { isLoading, cart, setCart } = useCart();
+  const { isLoading, cart, setCart, updateQuantity, deleteCartItemFromCart } =
+    useCart();
+  const [removeItemAlertState, setRemoveItemAlertState] =
+    useState<RemoveItemAlertState>({ isOpen: false, productVariantId: "" });
 
   const { width } = useWindowDimensions();
 
@@ -48,8 +57,42 @@ export default function Cart() {
       };
     });
   };
-  const onRemoveIconClicked = () => {};
-  const onAddIconClicked = () => {};
+
+  const onRemoveIconClicked = (cartItem: CartItem) => {
+    let newQuantity = cartItem.quantity - 1;
+    if (newQuantity === 0) {
+      setRemoveItemAlertState({
+        isOpen: true,
+        productVariantId: cartItem.productVariantId,
+      });
+    } else {
+      updateQuantity(newQuantity, cartItem.quantity, cartItem.productVariantId);
+    }
+  };
+
+  const onDisableRemoveItemFromCartAlert = () => {
+    setRemoveItemAlertState({
+      isOpen: false,
+      productVariantId: "",
+    });
+  };
+
+  const onRemoveItemFromCartConfirm = (productVariandId: string) => {
+    setRemoveItemAlertState({
+      isOpen: false,
+      productVariantId: "",
+    });
+    deleteCartItemFromCart(productVariandId);
+  };
+
+  const onAddIconClicked = (cartItem: CartItem) => {
+    if (cartItem.quantity >= cartItem.productVariant.quantity) {
+      //TODO:
+    } else {
+      let newQuantity = cartItem.quantity + 1;
+      updateQuantity(newQuantity, cartItem.quantity, cartItem.productVariantId);
+    }
+  };
 
   const onCheckoutButtonClicked = () => {
     //TODO:
@@ -59,7 +102,7 @@ export default function Cart() {
     const cartItem = item.cartItem;
     const isChecked = item.isChecked;
 
-    // const quantity = cartItem.quantity;
+    const quantity = cartItem.quantity;
     const productVariant = cartItem.productVariant!;
     const price = Number(productVariant.price).toFixed(2);
     const productName = productVariant.product.name;
@@ -153,7 +196,7 @@ export default function Cart() {
                     padding: 2,
                     opacity: pressed ? 0.6 : 1,
                   })}
-                  onPress={onRemoveIconClicked}
+                  onPress={() => onRemoveIconClicked(cartItem)}
                 >
                   <MaterialIcons size={24} name="remove" />
                 </Pressable>
@@ -165,7 +208,7 @@ export default function Cart() {
                     alignItems: "center",
                   }}
                 >
-                  <AppText variant="labelMedium">1</AppText>
+                  <AppText variant="labelMedium">{quantity}</AppText>
                 </View>
 
                 <Pressable
@@ -177,7 +220,7 @@ export default function Cart() {
                     padding: 2,
                     opacity: pressed ? 0.6 : 1,
                   })}
-                  onPress={onAddIconClicked}
+                  onPress={() => onAddIconClicked(cartItem)}
                 >
                   <MaterialIcons size={24} name="add" />
                 </Pressable>
@@ -248,6 +291,17 @@ export default function Cart() {
           </AppButton>
         </View>
       </View>
+      <AppModal
+        visible={removeItemAlertState.isOpen}
+        title=""
+        message="Are you sure you want to remove the product from cart?"
+        onClose={onDisableRemoveItemFromCartAlert}
+        displayCancelButton
+        onConfirm={() =>
+          onRemoveItemFromCartConfirm(removeItemAlertState.productVariantId)
+        }
+        buttonLabel="OK"
+      />
     </SafeAreaView>
   );
 }

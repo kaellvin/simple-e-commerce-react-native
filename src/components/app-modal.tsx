@@ -6,6 +6,7 @@ function AppModal({
   visible,
   onConfirm,
   onClose,
+  displayCancelButton = false,
   title,
   message,
   buttonLabel,
@@ -13,6 +14,7 @@ function AppModal({
   visible: boolean;
   onConfirm: () => void;
   onClose: () => void;
+  displayCancelButton?: boolean;
   title?: string;
   message?: string;
   buttonLabel: string;
@@ -36,7 +38,18 @@ function AppModal({
         >
           {title && <AppText variant="titleLarge">{title}</AppText>}
           {message && <AppText variant="bodyLarge">{message}</AppText>}
-          <View style={{ marginLeft: "auto" }}>
+          <View style={{ flexDirection: "row", marginLeft: "auto" }}>
+            {displayCancelButton && (
+              <Pressable
+                onPress={onClose}
+                style={({ pressed }) => [
+                  { padding: 8 },
+                  { opacity: pressed ? 0.6 : 1 },
+                ]}
+              >
+                <AppText variant="titleMedium">CANCEL</AppText>
+              </Pressable>
+            )}
             <Pressable
               onPress={onConfirm}
               style={({ pressed }) => [

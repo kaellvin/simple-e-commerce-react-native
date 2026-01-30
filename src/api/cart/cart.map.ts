@@ -1,22 +1,24 @@
 import {
-    Cart,
-    CartDto,
-    CartItemAndSelection,
-    CartItemDto,
-    CartOption,
-    CartOptionDto,
-    CartOptionValue,
-    CartOptionValueDto,
-    CartOptionValueImage,
-    CartOptionValueImageDto,
-    CartOptionValueWithName,
-    CartOptionValueWithNameDto,
-    CartProduct,
-    CartProductDto,
-    CartProductVariant,
-    CartProductVariantDto,
-    CartVariantOption,
-    CartVariantOptionDto,
+  Cart,
+  CartDto,
+  CartItemAndSelection,
+  CartItemDto,
+  CartItemUpdate,
+  CartItemUpdateRequest,
+  CartOption,
+  CartOptionDto,
+  CartOptionValue,
+  CartOptionValueDto,
+  CartOptionValueImage,
+  CartOptionValueImageDto,
+  CartOptionValueWithName,
+  CartOptionValueWithNameDto,
+  CartProduct,
+  CartProductDto,
+  CartProductVariant,
+  CartProductVariantDto,
+  CartVariantOption,
+  CartVariantOptionDto,
 } from "@/src/types/cart/cart";
 import { toProductOption } from "../products/product.map";
 
@@ -83,4 +85,13 @@ export const toCartOptionValueWithName = (
 
 export const toCartOption = (dto: CartOptionDto): CartOption => ({
   id: dto.id,
+});
+
+//-- FOR POST/PATCH ACTION
+export const toCartItemUpdateRequest = (
+  item: CartItemUpdate,
+): CartItemUpdateRequest => ({
+  quantity: item.newQuantity,
+  productVariantId: item.productVariantId,
+  cartId: item.cartId,
 });
