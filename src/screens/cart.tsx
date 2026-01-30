@@ -4,6 +4,7 @@ import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { FlatList, Pressable, useWindowDimensions, View } from "react-native";
+import { RefreshControl } from "react-native-gesture-handler";
 import ReanimatedSwipeable, {
   SwipeableMethods,
 } from "react-native-gesture-handler/ReanimatedSwipeable";
@@ -24,8 +25,15 @@ import {
 
 export default function Cart() {
   const { session } = useAuth();
-  const { isLoading, cart, setCart, updateQuantity, deleteCartItemFromCart } =
-    useCart();
+  const {
+    isLoading,
+    refreshing,
+    cart,
+    setCart,
+    updateQuantity,
+    deleteCartItemFromCart,
+    onRefresh,
+  } = useCart();
   const [removeItemAlertState, setRemoveItemAlertState] =
     useState<RemoveItemAlertState>({ isOpen: false, productVariantId: "" });
 
@@ -274,6 +282,9 @@ export default function Cart() {
           ListEmptyComponent={() => (
             <CenteredMessage message="Your cart is empty" />
           )}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
         <View style={{ marginHorizontal: 16 }}>
           <AppText
