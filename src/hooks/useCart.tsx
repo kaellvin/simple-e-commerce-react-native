@@ -23,23 +23,25 @@ type CartState = {
 };
 
 type CartAction =
+  | { type: "stateReset" }
   | { type: "loadInProgress" }
   | { type: "refreshInProgress" }
   | { type: "updateInProgress" }
   | { type: "loadSuccess"; payload: Cart | null }
   | { type: "updateSuccess"; payload: Cart | null }
   | {
-      type: "checkboxToggled";
+      type: "toggleCartItemSelection";
       payload: { isChecked: boolean; productVariantId: string };
     }
   | {
-      type: "updateQuantity";
+      type: "updateCartItemQuantity";
       payload: { newQuantity: number; productVariantId: string };
     }
   | {
-      type: "restoreQuantity";
+      type: "restoreCartItemQuantity";
       payload: Map<string, number>;
-    };
+    }
+  | { type: "restoreRemovedCartItem"; payload: Cart };
 
 const initialState: CartState = {
   status: CartStatus.Initial,
@@ -48,6 +50,8 @@ const initialState: CartState = {
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
+    case "stateReset":
+      return { cart: null, status: CartStatus.Initial };
     case "loadInProgress":
       return { ...state, status: CartStatus.Loading };
     case "refreshInProgress":
@@ -57,8 +61,8 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case "loadSuccess":
       return { ...state, status: CartStatus.Success, cart: action.payload };
     case "updateSuccess":
-      return { ...state, cart: action.payload };
-    case "checkboxToggled":
+      return { ...state, status: CartStatus.Success, cart: action.payload };
+    case "toggleCartItemSelection":
       return {
         ...state,
         cart:
@@ -78,7 +82,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
                 ),
               },
       };
-    case "updateQuantity":
+    case "updateCartItemQuantity":
       return {
         ...state,
         cart:
@@ -101,7 +105,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
                 ],
               },
       };
-    case "restoreQuantity":
+    case "restoreCartItemQuantity":
       let prevCartItemQuantityMap = action.payload;
       return {
         ...state,
@@ -128,6 +132,12 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
                 ],
               },
       };
+    case "restoreRemovedCartItem":
+      return {
+        ...state,
+        status: CartStatus.Success,
+        cart: action.payload,
+      };
   }
 };
 
@@ -139,6 +149,7 @@ function useCart() {
   const pendingCartItemUpdateMapRef = useRef<Map<string, CartItemUpdate>>(
     new Map(),
   );
+  const animationResetMapRef = useRef<Map<string, () => void>>(new Map());
   const debouncedCartItemUpdateRef =
     useRef<DebouncedFuncForCartItemUpdate>(null);
 
@@ -194,6 +205,8 @@ function useCart() {
       return () => {
         debouncedCartItemUpdateRef.current?.cancel();
       };
+    } else {
+      dispatch({ type: "stateReset" });
     }
   }, [session]);
 
@@ -249,7 +262,7 @@ function useCart() {
     productVariantId: string,
   ) => {
     dispatch({
-      type: "updateQuantity",
+      type: "updateCartItemQuantity",
       payload: { newQuantity: newQuantity, productVariantId: productVariantId },
     });
   };
@@ -257,7 +270,10 @@ function useCart() {
   const _restoreCartItemQuantity = () => {
     let prevCartItemQuantityMap = prevCartItemQuantityMapRef.current;
 
-    dispatch({ type: "restoreQuantity", payload: prevCartItemQuantityMap });
+    dispatch({
+      type: "restoreCartItemQuantity",
+      payload: prevCartItemQuantityMap,
+    });
 
     //reset
     prevCartItemQuantityMapRef.current.clear();
@@ -266,6 +282,8 @@ function useCart() {
 
   const deleteCartItemFromCart = async (productVariantId: string) => {
     if (!state.cart || !session) return;
+
+    const cachedCart = structuredClone(state.cart);
 
     try {
       dispatch({ type: "updateInProgress" });
@@ -278,6 +296,8 @@ function useCart() {
       showToast("Cart item removed successfully.");
     } catch (error) {
       if (error instanceof Error) {
+        animationResetMapRef.current.get(productVariantId)?.();
+        dispatch({ type: "restoreRemovedCartItem", payload: cachedCart });
         showToast("Something wrong. Please try again later.");
       }
     }
@@ -293,18 +313,26 @@ function useCart() {
 
   const onCheckboxChange = (isChecked: boolean, productVariantId: string) => {
     dispatch({
-      type: "checkboxToggled",
+      type: "toggleCartItemSelection",
       payload: { isChecked: isChecked, productVariantId: productVariantId },
     });
+  };
+
+  const onCheckout = () => {
+    showToast(
+      "This is a prototype application. No checkout operations will occur.",
+    );
   };
 
   return {
     state,
     cartItemCount: state.cart?.cartItemAndSelections.length ?? 0,
+    animationResetMapRef,
     onCheckboxChange,
     updateQuantity,
     deleteCartItemFromCart,
     onRefresh,
+    onCheckout,
   };
 }
 

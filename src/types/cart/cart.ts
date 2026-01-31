@@ -136,10 +136,15 @@ export interface CartItemUpdateRequest {
 
 //-- DELETE ACTION
 export interface RemoveItemAlertState {
-  productVariantId: string;
   isOpen: boolean;
+  productVariantId: string;
 }
 
-export interface DELETECartItemResponse extends CartResponse<Cart | null> {
+export interface DELETECartItemResponse extends CartResponse<CartDto | null> {
   message: string;
+}
+
+export interface MaxQuantityExceededAlertState {
+  isOpen: boolean;
+  stock: number;
 }

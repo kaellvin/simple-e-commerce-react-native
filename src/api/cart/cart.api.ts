@@ -66,5 +66,11 @@ export const deleteCartItem = async (
       },
     },
   );
-  return response.data;
+  const cart = response.data;
+
+  if (cart) {
+    return toCart(cart);
+  } else {
+    return null;
+  }
 };
