@@ -164,7 +164,7 @@ export default function Cart() {
           ListEmptyComponent={() => (
             <CenteredMessage message="Your cart is empty." />
           )}
-          ItemSeparatorComponent={() => Divider()}
+          ItemSeparatorComponent={Divider}
           refreshControl={
             <RefreshControl
               refreshing={cartState.status === CartStatus.Refreshing}
