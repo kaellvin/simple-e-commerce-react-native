@@ -6,6 +6,7 @@ import {
   updateCartItems,
 } from "@/src/api/cart/cart.api";
 import useAuth from "@/src/hooks/useAuth";
+import useLoadingModal from "@/src/hooks/useLoadingModal";
 import useMaximumQuantityExceededModal from "@/src/hooks/useMaximumQuantityExceededModal";
 import useToast from "@/src/hooks/useToast";
 import {
@@ -158,6 +159,7 @@ function CartProvider({ children }: { children: React.ReactNode }) {
   const { showToast } = useToast();
   const { setMaxQuantityExceededAlertState } =
     useMaximumQuantityExceededModal();
+  const { setIsVisible } = useLoadingModal();
 
   const prevCartItemQuantityMapRef = useRef<Map<string, number>>(new Map());
   const pendingCartItemUpdateMapRef = useRef<Map<string, CartItemUpdate>>(
@@ -233,6 +235,7 @@ function CartProvider({ children }: { children: React.ReactNode }) {
 
     if (cart === null) {
       try {
+        setIsVisible(true);
         dispatch({ type: "updateInProgress" });
 
         const cartItemAdd: CartItemAdd = {
@@ -248,6 +251,8 @@ function CartProvider({ children }: { children: React.ReactNode }) {
         if (error instanceof Error) {
           showToast("Something wrong. Please try again later.");
         }
+      } finally {
+        setIsVisible(false);
       }
     } else {
       const cartItemAndSelection = cart.cartItemAndSelections.find(
@@ -265,6 +270,7 @@ function CartProvider({ children }: { children: React.ReactNode }) {
         });
       } else {
         try {
+          setIsVisible(true);
           dispatch({ type: "updateInProgress" });
 
           const cartItemQuantityUpdate: CartItemQuantityUpdate = {
@@ -282,6 +288,8 @@ function CartProvider({ children }: { children: React.ReactNode }) {
           if (error instanceof Error) {
             showToast("Something wrong. Please try again later.");
           }
+        } finally {
+          setIsVisible(false);
         }
       }
     }
@@ -349,6 +357,7 @@ function CartProvider({ children }: { children: React.ReactNode }) {
     const cachedCart = structuredClone(state.cart);
 
     try {
+      setIsVisible(true);
       dispatch({ type: "updateInProgress" });
       const newCart = await deleteCartItem(
         session.access_token,
@@ -363,6 +372,8 @@ function CartProvider({ children }: { children: React.ReactNode }) {
         dispatch({ type: "restoreRemovedCartItem", payload: cachedCart });
         showToast("Something wrong. Please try again later.");
       }
+    } finally {
+      setIsVisible(false);
     }
   };
 

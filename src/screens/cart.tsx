@@ -30,7 +30,6 @@ import AppText from "../components/app-text";
 import CenteredMessage from "../components/centered-message";
 import Divider from "../components/divider";
 import LoadingIndicator from "../components/loading-indicator";
-import LoadingOverlay from "../components/loading-overlay";
 import useAuth from "../hooks/useAuth";
 import useCart from "../hooks/useCart";
 import useMaximumQuantityExceededModal from "../hooks/useMaximumQuantityExceededModal";
@@ -200,8 +199,6 @@ export default function Cart() {
         }
         buttonLabel="OK"
       />
-
-      <LoadingOverlay visible={cartState.status === CartStatus.Updating} />
     </SafeAreaView>
   );
 }
