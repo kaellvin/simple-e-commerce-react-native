@@ -1,8 +1,12 @@
 import {
   Cart,
   CartDto,
+  CartItemAdd,
+  CartItemAddRequest,
   CartItemAndSelection,
   CartItemDto,
+  CartItemQuantityUpdate,
+  CartItemQuantityUpdateRequest,
   CartItemUpdate,
   CartItemUpdateRequest,
   CartOption,
@@ -88,6 +92,20 @@ export const toCartOption = (dto: CartOptionDto): CartOption => ({
 });
 
 //-- FOR POST/PATCH ACTION
+export const toCartItemAddRequest = (
+  item: CartItemAdd,
+): CartItemAddRequest => ({
+  quantity: item.quantity,
+  productVariantId: item.productVariantId,
+});
+
+export const toCartItemQuantityUpdateRequest = (
+  item: CartItemQuantityUpdate,
+): CartItemQuantityUpdateRequest => ({
+  quantity: item.quantity,
+  cartId: item.cartId,
+});
+
 export const toCartItemUpdateRequest = (
   item: CartItemUpdate,
 ): CartItemUpdateRequest => ({

@@ -1,6 +1,7 @@
 import AppModal from "@/src/components/app-modal";
 import Divider from "@/src/components/divider";
 import useAuth from "@/src/hooks/useAuth";
+import useCart from "@/src/hooks/useCart";
 import { PVOptionValue } from "@/src/types/product/product";
 import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, {
@@ -33,6 +34,7 @@ export default function ProductDetail() {
   const { id: productId } = useLocalSearchParams<{ id: string }>();
 
   const { session } = useAuth();
+  const { validateBeforeAddingCartItem } = useCart();
   const {
     isLoading,
     error,
@@ -164,11 +166,15 @@ export default function ProductDetail() {
     setQuantity((prev) => (prev < activeVariant.quantity ? prev + 1 : prev));
   };
 
-  const onBottomSheetAddToCartButtonClicked = () => {
+  const onBottomSheetAddToCartButtonClicked = (
+    quantity: number,
+    stock: number,
+    productVariantId: string,
+  ) => {
     if (session === null) {
       setShowLoginAlert(true);
     } else {
-      //TODO
+      validateBeforeAddingCartItem(quantity, stock, productVariantId);
     }
   };
 
@@ -381,7 +387,13 @@ export default function ProductDetail() {
 
               <AppButton
                 variant="primary"
-                onPress={onBottomSheetAddToCartButtonClicked}
+                onPress={() =>
+                  onBottomSheetAddToCartButtonClicked(
+                    quantity,
+                    activeVariant.quantity,
+                    activeVariant.id,
+                  )
+                }
               >
                 Add To Cart
               </AppButton>

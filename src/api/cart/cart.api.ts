@@ -1,11 +1,18 @@
 import {
+  CartItemAdd,
+  CartItemQuantityUpdate,
   CartItemUpdate,
   CartResponse,
   DELETECartItemResponse,
   GETCartResponse,
 } from "@/src/types/cart/cart";
 import { fetchWithErrorHanding } from "@/utils/my-utils";
-import { toCart, toCartItemUpdateRequest } from "./cart.map";
+import {
+  toCart,
+  toCartItemAddRequest,
+  toCartItemQuantityUpdateRequest,
+  toCartItemUpdateRequest,
+} from "./cart.map";
 
 export const getCart = async (accessToken: string) => {
   const response = await fetchWithErrorHanding<GETCartResponse>(
@@ -16,6 +23,51 @@ export const getCart = async (accessToken: string) => {
       },
     },
   );
+  const cart = response.data;
+
+  if (cart) {
+    return toCart(cart);
+  } else {
+    return null;
+  }
+};
+
+export const addCartItem = async (
+  accessToken: string,
+  cartItemAdd: CartItemAdd,
+) => {
+  await fetchWithErrorHanding<CartResponse>(
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/public/v1/cart/items`,
+    {
+      method: "POST",
+      body: JSON.stringify(toCartItemAddRequest(cartItemAdd)),
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    },
+  );
+};
+
+export const updateCartItem = async (
+  accessToken: string,
+  productVariantId: string,
+  cartItemQuantityUpdate: CartItemQuantityUpdate,
+) => {
+  const response = await fetchWithErrorHanding<CartResponse>(
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/public/v1/cart/items/${productVariantId}?details=true`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(
+        toCartItemQuantityUpdateRequest(cartItemQuantityUpdate),
+      ),
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
   const cart = response.data;
 
   if (cart) {

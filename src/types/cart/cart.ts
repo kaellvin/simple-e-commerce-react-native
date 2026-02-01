@@ -121,6 +121,26 @@ export interface CartOption {
 }
 
 //-- FOR POST/PATCH ACTION
+export interface CartItemAdd {
+  readonly quantity: number;
+  readonly productVariantId: string;
+}
+
+export interface CartItemAddRequest {
+  readonly quantity: number;
+  readonly productVariantId: string;
+}
+
+export interface CartItemQuantityUpdate {
+  readonly quantity: number;
+  readonly cartId: string;
+}
+
+export interface CartItemQuantityUpdateRequest {
+  readonly quantity: number;
+  readonly cartId: string;
+}
+
 export interface CartItemUpdate {
   readonly newQuantity: number;
   readonly quantity: number;

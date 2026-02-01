@@ -1,3 +1,4 @@
+import { CartStatus } from "@/providers/CartProvider";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Checkbox } from "expo-checkbox";
 import { Image } from "expo-image";
@@ -31,7 +32,7 @@ import Divider from "../components/divider";
 import LoadingIndicator from "../components/loading-indicator";
 import LoadingOverlay from "../components/loading-overlay";
 import useAuth from "../hooks/useAuth";
-import useCart, { CartStatus } from "../hooks/useCart";
+import useCart from "../hooks/useCart";
 import {
   CartItem,
   CartItemAndSelection,

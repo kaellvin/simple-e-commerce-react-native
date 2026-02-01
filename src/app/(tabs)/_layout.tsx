@@ -4,7 +4,10 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 function TabLayout() {
-  const { cartItemCount } = useCart();
+  const { getCartItemCount } = useCart();
+
+  const cartItemCount = getCartItemCount();
+
   return (
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
