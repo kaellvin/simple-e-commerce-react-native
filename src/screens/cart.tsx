@@ -1,4 +1,4 @@
-import { CartStatus } from "@/providers/CartProvider";
+import { CartStatus } from "@/providers/cart-provider";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Checkbox } from "expo-checkbox";
 import { Image } from "expo-image";
@@ -33,10 +33,10 @@ import LoadingIndicator from "../components/loading-indicator";
 import LoadingOverlay from "../components/loading-overlay";
 import useAuth from "../hooks/useAuth";
 import useCart from "../hooks/useCart";
+import useMaximumQuantityExceededModal from "../hooks/useMaximumQuantityExceededModal";
 import {
   CartItem,
   CartItemAndSelection,
-  MaxQuantityExceededAlertState,
   RemoveItemAlertState,
 } from "../types/cart/cart";
 
@@ -51,10 +51,10 @@ export default function Cart() {
     onRefresh,
     onCheckout,
   } = useCart();
+  const { setMaxQuantityExceededAlertState } =
+    useMaximumQuantityExceededModal();
   const [removeItemAlertState, setRemoveItemAlertState] =
     useState<RemoveItemAlertState>({ isOpen: false, productVariantId: "" });
-  const [maxQuantityExceededAlertState, setMaxQuantityExceededAlertState] =
-    useState<MaxQuantityExceededAlertState>({ isOpen: false, stock: 0 });
 
   const { width } = useWindowDimensions();
 
@@ -84,13 +84,6 @@ export default function Cart() {
     setRemoveItemAlertState({
       isOpen: false,
       productVariantId: "",
-    });
-  };
-
-  const onDisableMaxQuantityExceededAlert = () => {
-    setMaxQuantityExceededAlertState({
-      isOpen: false,
-      stock: 0,
     });
   };
 
@@ -207,14 +200,7 @@ export default function Cart() {
         }
         buttonLabel="OK"
       />
-      <AppModal
-        visible={maxQuantityExceededAlertState.isOpen}
-        title="Maximum quantity exceeded"
-        message={`Sorry. Your cart has exceeded maximum quantity of this product.\nMaximum: ${maxQuantityExceededAlertState.stock}`}
-        onClose={onDisableMaxQuantityExceededAlert}
-        onConfirm={onDisableMaxQuantityExceededAlert}
-        buttonLabel="Close"
-      />
+
       <LoadingOverlay visible={cartState.status === CartStatus.Updating} />
     </SafeAreaView>
   );

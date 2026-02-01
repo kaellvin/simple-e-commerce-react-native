@@ -6,6 +6,7 @@ import {
   updateCartItems,
 } from "@/src/api/cart/cart.api";
 import useAuth from "@/src/hooks/useAuth";
+import useMaximumQuantityExceededModal from "@/src/hooks/useMaximumQuantityExceededModal";
 import useToast from "@/src/hooks/useToast";
 import {
   Cart,
@@ -155,6 +156,8 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 function CartProvider({ children }: { children: React.ReactNode }) {
   const { session } = useAuth();
   const { showToast } = useToast();
+  const { setMaxQuantityExceededAlertState } =
+    useMaximumQuantityExceededModal();
 
   const prevCartItemQuantityMapRef = useRef<Map<string, number>>(new Map());
   const pendingCartItemUpdateMapRef = useRef<Map<string, CartItemUpdate>>(
@@ -256,7 +259,10 @@ function CartProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (newQuantity > stock) {
-        //TODO:
+        setMaxQuantityExceededAlertState({
+          isOpen: true,
+          stock: stock,
+        });
       } else {
         try {
           dispatch({ type: "updateInProgress" });
