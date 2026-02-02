@@ -1,97 +1,160 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer } from "react";
 import { Keyboard } from "react-native";
 import { getProducts } from "../api/products/product.api";
 import { Product } from "../types/product/product";
 import useToast from "./useToast";
 
+export type LoadStatus =
+  | "initial"
+  | "loading"
+  | "refreshing"
+  | "success"
+  | "failure";
+export type SearchStatus = "initial" | "searching" | "success" | "failure";
+
+type ProductsState = {
+  status: LoadStatus;
+  products: Product[];
+  error: string;
+
+  isSearchMode: boolean;
+  searchInput: string;
+  filteredProducts: Product[];
+  searchStatus: SearchStatus;
+};
+
+type ProductsAction =
+  | { type: "loadInProgress" }
+  | { type: "refreshInProgress" }
+  | { type: "loadSuccess"; payload: Product[] }
+  | { type: "loadFailure"; payload: string }
+  | { type: "enterSearchMode" }
+  | { type: "enterSearchInput"; payload: string }
+  | { type: "searchInProgress" }
+  | { type: "searchSuccess"; payload: Product[] }
+  | { type: "clearSearch" }
+  | { type: "exitSearchMode" };
+
+const initialState: ProductsState = {
+  status: "initial",
+  products: [],
+  error: "",
+
+  isSearchMode: false,
+  searchInput: "",
+  filteredProducts: [],
+  searchStatus: "initial",
+};
+const productsReducer = (
+  state: ProductsState,
+  action: ProductsAction,
+): ProductsState => {
+  switch (action.type) {
+    case "loadInProgress":
+      return { ...state, status: "loading" };
+    case "refreshInProgress":
+      return { ...state, status: "refreshing" };
+    case "loadSuccess":
+      return { ...state, status: "success", products: action.payload };
+    case "loadFailure":
+      return { ...state, status: "failure", error: action.payload };
+    case "enterSearchMode":
+      return { ...state, isSearchMode: true };
+    case "enterSearchInput":
+      return { ...state, searchInput: action.payload };
+    case "searchInProgress":
+      return { ...state, searchStatus: "searching" };
+    case "searchSuccess":
+      return {
+        ...state,
+        searchStatus: "success",
+        filteredProducts: action.payload,
+      };
+    case "clearSearch":
+      return { ...state, searchInput: "", filteredProducts: [] };
+    case "exitSearchMode":
+      return {
+        ...state,
+        isSearchMode: false,
+        searchInput: "",
+        filteredProducts: [],
+        searchStatus: "initial",
+      };
+  }
+};
+
 function useProducts() {
-  const [refreshing, setRefreshing] = useState(false);
-  const [isSearch, setIsSearch] = useState<boolean>(false);
-  const [searchInput, setSearchInput] = useState("");
-  const [isSearchSubmitted, setIsSearchSubmitted] = useState<boolean>(false);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-
-  const [products, setProducts] = useState<Product[]>([]);
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
   const { showToast } = useToast();
+  const [state, dispatch] = useReducer(productsReducer, initialState);
 
-  const getHomeProducts = useCallback(async () => {
-    try {
-      setIsLoading(false);
-      const products = await getProducts();
-      setProducts(products);
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
+  const getHomeProducts = useCallback(
+    async ({ isRefresh = false }: { isRefresh?: boolean }) => {
+      try {
+        if (isRefresh) {
+          dispatch({ type: "refreshInProgress" });
+        } else {
+          dispatch({ type: "loadInProgress" });
+        }
+        const products = await getProducts();
+
+        dispatch({ type: "loadSuccess", payload: products });
+      } catch (error) {
+        if (error instanceof Error) {
+          dispatch({ type: "loadFailure", payload: error.message });
+          showToast("Something wrong. Please try again later.");
+        }
       }
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   useEffect(() => {
-    getHomeProducts();
+    getHomeProducts({});
   }, [getHomeProducts]);
 
   const onRefresh = async () => {
-    setRefreshing(true);
-    await getHomeProducts();
-    setRefreshing(false);
+    await getHomeProducts({ isRefresh: true });
     showToast("Updated Information.");
   };
 
   const onEnterSearchMode = () => {
-    setIsSearch(true);
+    dispatch({ type: "enterSearchMode" });
   };
 
   const onExitSearchMode = () => {
     Keyboard.dismiss();
-    setIsSearch(false);
-    _clearText();
-    setFilteredProducts([]);
-    setIsSearchSubmitted(false);
+    dispatch({ type: "exitSearchMode" });
   };
 
   const onChangeSearchText = (text: string) => {
-    setSearchInput(text);
+    dispatch({ type: "enterSearchInput", payload: text });
   };
   const onClearSearchText = () => {
-    _clearText();
-  };
-
-  const _clearText = () => {
-    setSearchInput("");
+    dispatch({ type: "enterSearchInput", payload: "" });
   };
 
   const onSearchSubmit = async () => {
-    setIsSearchSubmitted(true);
+    const searchInput = state.searchInput;
     if (searchInput.length > 0) {
       try {
+        dispatch({ type: "searchInProgress" });
         const filteredProducts = await getProducts(searchInput);
-        setFilteredProducts(filteredProducts);
+        dispatch({ type: "searchSuccess", payload: filteredProducts });
       } catch (error) {
         if (error instanceof Error) {
+          dispatch({ type: "loadFailure", payload: error.message });
           showToast("Something wrong. Please try again later.");
         }
       }
     } else {
-      _clearText();
+      dispatch({ type: "clearSearch" });
     }
   };
 
   return {
-    refreshing,
-    searchInput,
-    isSearch,
-    isSearchSubmitted,
+    state,
     onEnterSearchMode,
     onExitSearchMode,
-    isLoading,
-    error,
-    products,
-    filteredProducts,
     onRefresh,
     onChangeSearchText,
     onClearSearchText,

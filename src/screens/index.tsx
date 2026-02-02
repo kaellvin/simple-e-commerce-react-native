@@ -1,38 +1,118 @@
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import {
-  FlatList,
-  RefreshControl,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { RefreshControl, useWindowDimensions, View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AppText from "../components/app-text";
 import CenteredMessage from "../components/centered-message";
 import Divider from "../components/divider";
 import LoadingIndicator from "../components/loading-indicator";
 import SearchBar from "../components/search-bar";
-import useProducts from "../hooks/useProducts";
+import useProducts, { LoadStatus, SearchStatus } from "../hooks/useProducts";
 import { Product } from "../types/product/product";
 
 export default function Home() {
   const {
-    refreshing,
-    searchInput,
-    isSearch,
-    isSearchSubmitted,
+    state: productsState,
     onEnterSearchMode,
     onExitSearchMode,
-    isLoading,
-    error,
-    filteredProducts,
-    products,
     onRefresh,
     onChangeSearchText,
     onClearSearchText,
     onSearchSubmit,
   } = useProducts();
 
+  if (productsState.error)
+    return <CenteredMessage message={productsState.error} />;
+
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <SearchBar
+        isSearch={productsState.isSearchMode}
+        searchInput={productsState.searchInput}
+        onFocus={onEnterSearchMode}
+        onChangeSearchText={onChangeSearchText}
+        onClearSearchText={onClearSearchText}
+        onSearchSubmit={onSearchSubmit}
+        onExitSearchMode={onExitSearchMode}
+      />
+
+      {productsState.isSearchMode ? (
+        <HomeSearchContent
+          filteredProducts={productsState.filteredProducts}
+          searchStatus={productsState.searchStatus}
+          error={productsState.error}
+        />
+      ) : (
+        <HomeProductList
+          products={productsState.products}
+          status={productsState.status}
+          onRefresh={onRefresh}
+        />
+      )}
+    </SafeAreaView>
+  );
+}
+
+const HomeSearchContent = ({
+  filteredProducts,
+  searchStatus,
+  error,
+}: {
+  filteredProducts: Product[];
+  searchStatus: SearchStatus;
+  error: string;
+}) => {
+  const content = () => {
+    switch (searchStatus) {
+      case "initial":
+        return <CenteredMessage message="Search your product here" />;
+      case "searching":
+        return <LoadingIndicator />;
+      case "success":
+        return (
+          <FlatList
+            data={filteredProducts}
+            contentContainerStyle={{
+              flex: 1,
+              marginTop: 8,
+              paddingHorizontal: 12,
+            }}
+            renderItem={({ item }) => (
+              <Link
+                href={{
+                  pathname: "/product-detail/[id]",
+                  params: { id: item.id },
+                }}
+                style={{ padding: 8 }}
+                asChild
+              >
+                <AppText variant="titleMedium">{item.name}</AppText>
+              </Link>
+            )}
+            ListEmptyComponent={
+              <CenteredMessage message="No matching product found." />
+            }
+            ItemSeparatorComponent={Divider}
+          />
+        );
+      case "failure":
+        return <CenteredMessage message={error} />;
+    }
+  };
+
+  return <View style={{ flex: 1 }}>{content()}</View>;
+};
+
+const HomeProductList = ({
+  products,
+  status,
+  onRefresh,
+}: {
+  products: Product[];
+  status: LoadStatus;
+  onRefresh: () => void;
+}) => {
   const { width } = useWindowDimensions();
   const numColumns = 2;
   const contentPadding = 8;
@@ -41,79 +121,41 @@ export default function Home() {
   const itemWidth =
     (width - contentPadding * 2 - itemGutter * (numColumns - 1)) / numColumns;
 
-  if (isLoading) return <LoadingIndicator />;
-
-  if (error) return <CenteredMessage message={error} />;
+  if (status === "loading") return <LoadingIndicator />;
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <SearchBar
-        isSearch={isSearch}
-        searchInput={searchInput}
-        onFocus={onEnterSearchMode}
-        onChangeSearchText={onChangeSearchText}
-        onClearSearchText={onClearSearchText}
-        onSearchSubmit={onSearchSubmit}
-        onExitSearchMode={onExitSearchMode}
-      />
-      {isSearch ? (
-        <View style={{ flex: 1 }}>
-          {filteredProducts.length > 0 ? (
-            <FlatList
-              data={filteredProducts}
-              contentContainerStyle={{ marginTop: 8, paddingHorizontal: 12 }}
-              renderItem={({ item }) => (
-                <Link
-                  href={{
-                    pathname: "/product-detail/[id]",
-                    params: { id: item.id },
-                  }}
-                  style={{ padding: 8 }}
-                  asChild
-                >
-                  <AppText variant="titleMedium">{item.name}</AppText>
-                </Link>
-              )}
-              ItemSeparatorComponent={Divider}
-            />
-          ) : isSearchSubmitted ? (
-            <CenteredMessage message="No matching product found." />
-          ) : (
-            <CenteredMessage message="Search your product here" />
-          )}
-        </View>
-      ) : (
-        <FlatList
-          data={products}
-          numColumns={numColumns}
-          columnWrapperStyle={{
-            justifyContent: "space-between",
-            // paddingHorizontal: 8,
+    <FlatList
+      data={products}
+      numColumns={numColumns}
+      columnWrapperStyle={{
+        justifyContent: "space-between",
+        // paddingHorizontal: 8,
+      }}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={{ padding: contentPadding }}
+      renderItem={({ item }) => (
+        <Link
+          href={{
+            pathname: "/product-detail/[id]",
+            params: { id: item.id },
           }}
-          // keyExtractor={(_, index) => index.toString()}
-          contentContainerStyle={{ padding: contentPadding }}
-          renderItem={({ item }) => (
-            <Link
-              href={{
-                pathname: "/product-detail/[id]",
-                params: { id: item.id },
-              }}
-            >
-              <HomeItem
-                product={item}
-                itemWidth={itemWidth}
-                itemGutter={itemGutter}
-              />
-            </Link>
-          )}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        />
+        >
+          <HomeItem
+            product={item}
+            itemWidth={itemWidth}
+            itemGutter={itemGutter}
+          />
+        </Link>
       )}
-    </SafeAreaView>
+      refreshControl={
+        <RefreshControl
+          refreshing={status === "refreshing"}
+          onRefresh={onRefresh}
+        />
+      }
+    />
   );
-}
+};
 
 const HomeItem = ({
   product,
