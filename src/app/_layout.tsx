@@ -1,8 +1,8 @@
-import AuthProvider from "@/providers/auth-provider";
-import CartProvider from "@/providers/cart-provider";
-import LoadingProvider from "@/providers/loading-provider";
-import MaximumQuantityExceededProvider from "@/providers/maximum-quantity-exceeded-modal-provider";
-import ToastProvider from "@/providers/toast-provider";
+import AuthProvider from "@/src/providers/auth-provider";
+import CartProvider from "@/src/providers/cart-provider";
+import LoadingProvider from "@/src/providers/loading-provider";
+import MaximumQuantityExceededProvider from "@/src/providers/maximum-quantity-exceeded-modal-provider";
+import ToastProvider from "@/src/providers/toast-provider";
 import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";

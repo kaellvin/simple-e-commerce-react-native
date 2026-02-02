@@ -6,7 +6,7 @@ import {
   DELETECartItemResponse,
   GETCartResponse,
 } from "@/src/types/cart/cart";
-import { fetchWithErrorHanding } from "@/utils/my-utils";
+import { fetchWithErrorHanding } from "@/src/utils/my-utils";
 import {
   toCart,
   toCartItemAddRequest,

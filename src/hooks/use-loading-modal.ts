@@ -1,4 +1,4 @@
-import { LoadingContext } from "@/providers/loading-provider";
+import { LoadingContext } from "@/src/providers/loading-provider";
 import { useContext } from "react";
 
 function useLoadingModal() {

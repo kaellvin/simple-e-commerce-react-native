@@ -1,5 +1,5 @@
 import { SignUpRequest } from "@/src/types/user/user";
-import { fetchWithErrorHanding } from "@/utils/my-utils";
+import { fetchWithErrorHanding } from "@/src/utils/my-utils";
 
 export const createNewUser = async (id: string, email: string) => {
   let signUpRequest: SignUpRequest = {

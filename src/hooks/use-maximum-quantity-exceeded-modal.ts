@@ -1,4 +1,4 @@
-import { MaximumQuantityExceededModalContext } from "@/providers/maximum-quantity-exceeded-modal-provider";
+import { MaximumQuantityExceededModalContext } from "@/src/providers/maximum-quantity-exceeded-modal-provider";
 import { useContext } from "react";
 
 function useMaximumQuantityExceededModal() {

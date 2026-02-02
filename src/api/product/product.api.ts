@@ -2,7 +2,7 @@ import {
   ProductDetailResponse,
   ProductResponse,
 } from "@/src/types/product/product";
-import { fetchWithErrorHanding } from "@/utils/my-utils";
+import { fetchWithErrorHanding } from "@/src/utils/my-utils";
 import { toProduct, toProductDetail } from "./product.map";
 
 export const getProducts = async (query?: string) => {

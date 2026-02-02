@@ -1,4 +1,4 @@
-import { CartStatus } from "@/providers/cart-provider";
+import { CartStatus } from "@/src/providers/cart-provider";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Checkbox } from "expo-checkbox";
 import { Image } from "expo-image";
