@@ -1,4 +1,4 @@
-import useCart from "@/src/hooks/useCart";
+import useCart from "@/src/hooks/use-cart";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";

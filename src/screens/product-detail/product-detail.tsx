@@ -1,7 +1,7 @@
 import AppModal from "@/src/components/app-modal";
 import Divider from "@/src/components/divider";
-import useAuth from "@/src/hooks/useAuth";
-import useCart from "@/src/hooks/useCart";
+import useAuth from "@/src/hooks/use-auth";
+import useCart from "@/src/hooks/use-cart";
 import { PVOptionValue } from "@/src/types/product/product";
 import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, {
@@ -27,7 +27,7 @@ import AppText from "../../components/app-text";
 import CenteredMessage from "../../components/centered-message";
 import CircularIcon from "../../components/circular-icon";
 import LoadingIndicator from "../../components/loading-indicator";
-import useProduct from "../../hooks/useProduct";
+import useProduct from "../../hooks/use-product";
 import QuantityControl from "./quantity-control";
 
 export default function ProductDetail() {

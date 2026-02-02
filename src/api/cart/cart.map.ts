@@ -24,7 +24,7 @@ import {
   CartVariantOption,
   CartVariantOptionDto,
 } from "@/src/types/cart/cart";
-import { toProductOption } from "../products/product.map";
+import { toProductOption } from "../product/product.map";
 
 export const toCart = (dto: CartDto): Cart => ({
   id: dto.id,

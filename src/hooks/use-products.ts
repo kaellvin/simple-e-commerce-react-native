@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useReducer } from "react";
 import { Keyboard } from "react-native";
-import { getProducts } from "../api/products/product.api";
+import { getProducts } from "../api/product/product.api";
 import { Product } from "../types/product/product";
-import useToast from "./useToast";
+import useToast from "./use-toast";
 
 export type LoadStatus =
   | "initial"
@@ -98,6 +98,9 @@ function useProducts() {
         const products = await getProducts();
 
         dispatch({ type: "loadSuccess", payload: products });
+        if (isRefresh) {
+          showToast("Updated information.");
+        }
       } catch (error) {
         if (error instanceof Error) {
           dispatch({ type: "loadFailure", payload: error.message });
@@ -105,7 +108,7 @@ function useProducts() {
         }
       }
     },
-    [],
+    [showToast],
   );
 
   useEffect(() => {

@@ -30,9 +30,9 @@ import AppText from "../components/app-text";
 import CenteredMessage from "../components/centered-message";
 import Divider from "../components/divider";
 import LoadingIndicator from "../components/loading-indicator";
-import useAuth from "../hooks/useAuth";
-import useCart from "../hooks/useCart";
-import useMaximumQuantityExceededModal from "../hooks/useMaximumQuantityExceededModal";
+import useAuth from "../hooks/use-auth";
+import useCart from "../hooks/use-cart";
+import useMaximumQuantityExceededModal from "../hooks/use-maximum-quantity-exceeded-modal";
 import {
   CartItem,
   CartItemAndSelection,

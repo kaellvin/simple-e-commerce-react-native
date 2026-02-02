@@ -5,10 +5,10 @@ import {
   updateCartItem,
   updateCartItems,
 } from "@/src/api/cart/cart.api";
-import useAuth from "@/src/hooks/useAuth";
-import useLoadingModal from "@/src/hooks/useLoadingModal";
-import useMaximumQuantityExceededModal from "@/src/hooks/useMaximumQuantityExceededModal";
-import useToast from "@/src/hooks/useToast";
+import useAuth from "@/src/hooks/use-auth";
+import useLoadingModal from "@/src/hooks/use-loading-modal";
+import useMaximumQuantityExceededModal from "@/src/hooks/use-maximum-quantity-exceeded-modal";
+import useToast from "@/src/hooks/use-toast";
 import {
   Cart,
   CartItemAdd,

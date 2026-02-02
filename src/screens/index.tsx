@@ -8,7 +8,7 @@ import CenteredMessage from "../components/centered-message";
 import Divider from "../components/divider";
 import LoadingIndicator from "../components/loading-indicator";
 import SearchBar from "../components/search-bar";
-import useProducts, { LoadStatus, SearchStatus } from "../hooks/useProducts";
+import useProducts, { LoadStatus, SearchStatus } from "../hooks/use-products";
 import { Product } from "../types/product/product";
 
 export default function Home() {

@@ -5,10 +5,10 @@ import React, { useState } from "react";
 import { Keyboard, Pressable, StyleSheet, Text, View } from "react-native";
 import AppTextInput from "../components/app-text-input";
 import LoadingOverlay from "../components/loading-overlay";
-import useAuth from "../hooks/useAuth";
-import useToast from "../hooks/useToast";
+import useAuth from "../hooks/use-auth";
+import useToast from "../hooks/use-toast";
 
-const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_])[A-Za-z\d\W_]{10,}$/;
+// const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_])[A-Za-z\d\W_]{10,}$/;
 
 export default function SignIn() {
   const router = useRouter();

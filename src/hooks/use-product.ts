@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { getProduct } from "../api/products/product.api";
+import { getProduct } from "../api/product/product.api";
 import {
   EMPTY_PRODUCT_VARIANT,
   ProductDetail,

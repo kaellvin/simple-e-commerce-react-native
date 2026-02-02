@@ -5,8 +5,8 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AppText from "../components/app-text";
 import Divider from "../components/divider";
-import useAuth from "../hooks/useAuth";
-import useToast from "../hooks/useToast";
+import useAuth from "../hooks/use-auth";
+import useToast from "../hooks/use-toast";
 
 export default function Account() {
   const { session, signOut } = useAuth();
