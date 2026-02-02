@@ -47,7 +47,7 @@ function AppModal({
                   { opacity: pressed ? 0.6 : 1 },
                 ]}
               >
-                <AppText variant="titleMedium">CANCEL</AppText>
+                <AppText variant="titleMedium">No</AppText>
               </Pressable>
             )}
             <Pressable

@@ -197,7 +197,7 @@ export default function Cart() {
         onConfirm={() =>
           onRemoveItemFromCartConfirm(removeItemAlertState.productVariantId)
         }
-        buttonLabel="OK"
+        buttonLabel="Yes"
       />
     </SafeAreaView>
   );
