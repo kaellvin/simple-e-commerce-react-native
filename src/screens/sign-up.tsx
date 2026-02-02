@@ -1,12 +1,124 @@
-import React from "react";
-import { Text, View } from "react-native";
+import AppButton from "@/src/components/app-button";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Keyboard, Pressable, StyleSheet, Text, View } from "react-native";
+import AppTextInput from "../components/app-text-input";
+import useAuth from "../hooks/use-auth";
+import useLoadingModal from "../hooks/use-loading-modal";
+import useToast from "../hooks/use-toast";
 
-function SignUp() {
+export default function SignUp() {
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const { signUp } = useAuth();
+  const { showToast } = useToast();
+  const { setIsVisible } = useLoadingModal();
+
+  const onSignUpButtonClicked = async () => {
+    let isError = false;
+
+    setEmailError("");
+    setPasswordError("");
+
+    if (!email) {
+      setEmailError("Email is required.");
+      isError = true;
+    }
+    if (!password) {
+      setPasswordError("Password is required.");
+      isError = true;
+    } else {
+      // if (!passwordRegex.test(password)) {
+      //   setPasswordError(
+      //     "Password must be at least 10 characters long and include at least one uppercase letter and one symbol."
+      //   );
+      //   isError = true;
+      // }
+    }
+
+    if (!isError) {
+      Keyboard.dismiss();
+
+      try {
+        setIsVisible(true);
+        await signUp(email, password);
+        router.back();
+        showToast("Sign up successfully.");
+      } catch (error) {
+        if (error instanceof Error) {
+          showToast(error.message);
+        }
+      } finally {
+        setIsVisible(false);
+      }
+    }
+  };
+
   return (
-    <View>
-      <Text>SignUp</Text>
+    <View style={{ margin: 16, gap: 16 }}>
+      <View>
+        <View style={styles.textInputContainer}>
+          <AppTextInput
+            onChangeText={setEmail}
+            value={email}
+            placeholder="Email"
+            keyboardType="email-address"
+            autoCorrect={false}
+            contextMenuHidden={true}
+            variant="bodyLarge"
+          />
+        </View>
+        {emailError && <Text style={{ color: "red" }}>{emailError}</Text>}
+      </View>
+
+      <View>
+        <View
+          style={[
+            styles.textInputContainer,
+            { flexDirection: "row", alignItems: "center" },
+          ]}
+        >
+          <AppTextInput
+            onChangeText={setPassword}
+            value={password}
+            placeholder="Password"
+            secureTextEntry={!isPasswordVisible}
+            style={{ flex: 1 }}
+            variant="bodyLarge"
+          />
+          <Pressable
+            onPress={() => {
+              setIsPasswordVisible((prev) => !prev);
+            }}
+          >
+            <MaterialIcons
+              size={24}
+              name={isPasswordVisible ? "visibility-off" : "visibility"}
+            />
+          </Pressable>
+        </View>
+
+        {passwordError && <Text style={{ color: "red" }}>{passwordError}</Text>}
+      </View>
+
+      <AppButton variant="primary" onPress={onSignUpButtonClicked}>
+        Sign Up
+      </AppButton>
     </View>
   );
 }
 
-export default SignUp;
+const styles = StyleSheet.create({
+  textInputContainer: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 8,
+  },
+});
