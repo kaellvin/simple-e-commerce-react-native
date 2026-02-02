@@ -132,7 +132,9 @@ const HomeProductList = ({
         // paddingHorizontal: 8,
       }}
       keyExtractor={(item) => item.id}
-      contentContainerStyle={{ padding: contentPadding }}
+      contentContainerStyle={{
+        padding: contentPadding,
+      }}
       renderItem={({ item }) => (
         <Link
           href={{
@@ -168,36 +170,44 @@ const HomeItem = ({
 }) => {
   return (
     <View
+      //--
       style={{
-        width: itemWidth,
-        borderWidth: 1,
-        borderRadius: 12,
-        overflow: "hidden",
-        aspectRatio: 1 / 1.5,
-        marginBottom: itemGutter,
-        // shadowColor: "#000",
-        // shadowOffset: { width: 0, height: 2 },
-        // shadowOpacity: 0.1,
-        // shadowRadius: 4,
-        // elevation: 3,
+        shadowColor: "black",
+        shadowOffset: { width: 5, height: 5 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
       }}
     >
-      <Image
-        source={product.imageUrl}
-        style={{ aspectRatio: 1 }}
-        contentFit="contain"
-      />
-      <View style={{ flex: 1, justifyContent: "space-between" }}>
-        <AppText
-          style={{ paddingHorizontal: 8, paddingTop: 8 }}
-          variant="titleSmall"
-          numberOfLines={2}
-        >
-          {product.name}
-        </AppText>
-        <AppText style={{ padding: 8 }} variant="labelLarge">
-          {`RM  ${Number(product.price).toFixed(2)}`}
-        </AppText>
+      <View
+        style={{
+          width: itemWidth,
+          borderWidth: 1,
+          borderRadius: 12,
+          overflow: "hidden",
+          aspectRatio: 1 / 1.5,
+          marginBottom: itemGutter,
+          backgroundColor: "white",
+          //--
+          elevation: 16,
+        }}
+      >
+        <Image
+          source={product.imageUrl}
+          style={{ aspectRatio: 1 }}
+          contentFit="contain"
+        />
+        <View style={{ flex: 1, justifyContent: "space-between" }}>
+          <AppText
+            style={{ paddingHorizontal: 8, paddingTop: 8 }}
+            variant="titleSmall"
+            numberOfLines={2}
+          >
+            {product.name}
+          </AppText>
+          <AppText style={{ padding: 8 }} variant="labelLarge">
+            {`RM  ${Number(product.price).toFixed(2)}`}
+          </AppText>
+        </View>
       </View>
     </View>
   );

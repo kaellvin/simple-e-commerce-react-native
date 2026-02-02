@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useCallback, useState } from "react";
 import { StyleSheet, Text } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -18,16 +18,19 @@ function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const insets = useSafeAreaInsets();
 
-  const showToast = (message: string) => {
-    setMessage(message);
-    translateY.value = withTiming(0, { duration: 300 });
+  const showToast = useCallback(
+    (message: string) => {
+      setMessage(message);
+      translateY.value = withTiming(0, { duration: 300 });
 
-    setTimeout(() => {
-      translateY.value = withTiming(100, { duration: 300 }, () => {
-        scheduleOnRN(setMessage, "");
-      });
-    }, 2000);
-  };
+      setTimeout(() => {
+        translateY.value = withTiming(100, { duration: 300 }, () => {
+          scheduleOnRN(setMessage, "");
+        });
+      }, 2000);
+    },
+    [translateY],
+  );
 
   return (
     <ToastContext value={{ showToast }}>

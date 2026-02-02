@@ -9,7 +9,12 @@ function TabLayout() {
   const cartItemCount = getCartItemCount();
 
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "green",
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{

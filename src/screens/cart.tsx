@@ -259,7 +259,6 @@ export const RenderCartItem = memo(function RenderCartItem({
   //--
   if (!animationResetMapRef.current.has(cartItem.productVariantId)) {
     animationResetMapRef.current.set(cartItem.productVariantId, () => {
-      console.log("SHOULD WORK");
       translateX.value = withTiming(0);
     });
   }

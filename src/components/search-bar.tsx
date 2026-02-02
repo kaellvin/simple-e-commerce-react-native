@@ -57,6 +57,7 @@ function SearchBar({
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
+        marginVertical: 16,
       }}
     >
       <Animated.View style={[styles.container, textInputStyle]}>
@@ -69,7 +70,7 @@ function SearchBar({
           onSubmitEditing={onSearchSubmit}
           placeholder="Search products"
           variant="titleMedium"
-          style={{ flex: 1 }}
+          style={styles.textInput}
         />
         {input.length > 0 && (
           <Pressable onPress={onClearSearchText}>
@@ -99,5 +100,10 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingHorizontal: 8,
     marginHorizontal: 8,
+  },
+  textInput: {
+    flex: 1,
+    height: 40,
+    lineHeight: 20, //--
   },
 });
