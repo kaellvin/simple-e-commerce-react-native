@@ -17,7 +17,11 @@ export default function RootLayout() {
               <CartProvider>
                 <SafeAreaProvider>
                   {/* <Stack screenOptions={{ headerShown: false }} /> */}
-                  <Stack>
+                  <Stack
+                    screenOptions={{
+                      headerBackButtonDisplayMode: "minimal",
+                    }}
+                  >
                     <Stack.Screen
                       name="(tabs)"
                       options={{ headerShown: false }}

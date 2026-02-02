@@ -72,7 +72,6 @@ export default function SignIn() {
             value={email}
             placeholder="Email"
             keyboardType="email-address"
-            autoCorrect={false}
             contextMenuHidden={true}
             variant="bodyLarge"
           />
@@ -121,6 +120,6 @@ const styles = StyleSheet.create({
   textInputContainer: {
     borderWidth: 1,
     borderRadius: 8,
-    padding: 8,
+    paddingHorizontal: 8,
   },
 });

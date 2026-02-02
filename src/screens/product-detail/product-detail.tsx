@@ -268,7 +268,7 @@ export default function ProductDetail() {
               paddingHorizontal: 16,
               paddingTop: 16,
               gap: 16,
-              paddingBottom: inset.bottom,
+              paddingBottom: inset.bottom + 16,
             }}
           >
             <View style={{ flex: 1 }}>
@@ -285,10 +285,13 @@ export default function ProductDetail() {
         <BottomSheet
           ref={bottomSheetRef}
           index={-1}
+          enablePanDownToClose={true}
           backdropComponent={renderBackdrop}
         >
           <BottomSheetView>
-            <View style={{ padding: 16, gap: 16 }}>
+            <View
+              style={{ padding: 16, gap: 16, paddingBottom: inset.bottom + 16 }}
+            >
               <View style={{ flexDirection: "row", gap: 8 }}>
                 <Image
                   source={mainImageUrl}

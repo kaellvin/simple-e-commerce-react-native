@@ -70,7 +70,6 @@ export default function SignUp() {
             value={email}
             placeholder="Email"
             keyboardType="email-address"
-            autoCorrect={false}
             contextMenuHidden={true}
             variant="bodyLarge"
           />

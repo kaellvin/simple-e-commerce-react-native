@@ -26,7 +26,7 @@ export default function Home() {
     return <CenteredMessage message={productsState.error} />;
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
       <SearchBar
         isSearch={productsState.isSearchMode}
         searchInput={productsState.searchInput}
@@ -133,6 +133,7 @@ const HomeProductList = ({
       }}
       keyExtractor={(item) => item.id}
       contentContainerStyle={{
+        flexGrow: 1,
         padding: contentPadding,
       }}
       renderItem={({ item }) => (
@@ -188,7 +189,7 @@ const HomeItem = ({
           marginBottom: itemGutter,
           backgroundColor: "white",
           //--
-          elevation: 16,
+          elevation: 5,
         }}
       >
         <Image

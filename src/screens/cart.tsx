@@ -144,11 +144,11 @@ export default function Cart() {
       <CenteredMessage message="Your cart is empty." />
     </ScrollView>
   ) : (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView edges={["top"]} style={{ flex: 1, paddingBottom: 16 }}>
       <View style={{ flex: 1 }}>
         <FlatList
           keyExtractor={(item) => item.cartItem.productVariantId}
-          contentContainerStyle={{ flex: 1 }}
+          contentContainerStyle={{ flexGrow: 1 }}
           data={cartState.cart.cartItemAndSelections}
           renderItem={({ item }) => (
             <RenderCartItem
