@@ -5,6 +5,7 @@ import {
   ProductDetail,
   ProductVariant,
   PVOption,
+  PVOptionValue,
 } from "../types/product/product";
 
 function useProduct() {
@@ -202,6 +203,92 @@ function useProduct() {
       optionValueIdList.includes(item.optionValueId),
     )!;
   };
+
+  const onOptionItemClicked = (
+    idx: number,
+    optionId: string,
+    opValue: PVOptionValue,
+  ) => {
+    if (product !== null) {
+      if (idx === 0) {
+        //find all option combinations that contain selected option
+        const productVariantIds = product.productVariants
+          .flatMap((item) => item.variantOptions)
+          .filter((item) => opValue.id === item.optionValueId)
+          .map((item) => item.productVariantId);
+        const optionValueIds = product.productVariants
+          .flatMap((item) => item.variantOptions)
+          .filter((item) => productVariantIds.includes(item.productVariantId))
+          .map((item) => item.optionValueId);
+
+        //find first product variant that contain selected option
+        const matchedProductVariant = product.productVariants.find((item) =>
+          item.variantOptions.some((item) => item.optionValueId === opValue.id),
+        )!;
+        const pvOptionValueIds = matchedProductVariant.variantOptions.map(
+          (item) => item.optionValueId,
+        );
+
+        const newPvOptionList = pvOptionList.map((op) => ({
+          ...op,
+          values: op.values.map((item) => ({
+            ...item,
+            isSelected: pvOptionValueIds.includes(item.optionValue.id),
+            isWithinSelection:
+              optionValueIds.includes(item.optionValue.id) ||
+              op.id === optionId,
+          })),
+        }));
+
+        const optionValueImage = getMatchedOptionValueImage(
+          product,
+          matchedProductVariant,
+        );
+
+        setActiveVariant(matchedProductVariant);
+        setPVOptionList(newPvOptionList);
+
+        setMainImageUrl(optionValueImage.url);
+      } else {
+        //update only option value within same type
+        const newPvOptionList = pvOptionList.map((op) => ({
+          ...op,
+          values: op.values.map((item) => ({
+            ...item,
+            isSelected:
+              op.id === optionId
+                ? item.optionValue.name === opValue.name
+                : item.isSelected,
+          })),
+        }));
+
+        //extract product variant that matches all selected options
+        const selectedOptionValueIds = newPvOptionList.flatMap((item) =>
+          item.values
+            .filter((item) => item.isSelected)
+            .flatMap((item) => item.optionValue.id),
+        );
+
+        const newSelectedProductVariant = product.productVariants.find((item) =>
+          item.variantOptions.every((vo) =>
+            selectedOptionValueIds.includes(vo.optionValueId),
+          ),
+        )!;
+        const optionValueImage = getMatchedOptionValueImage(
+          product,
+          newSelectedProductVariant,
+        );
+
+        setActiveVariant(newSelectedProductVariant);
+        setPVOptionList(newPvOptionList);
+
+        setMainImageUrl(optionValueImage.url);
+      }
+
+      //reset quantity
+      setQuantity(1);
+    }
+  };
   //--
   const getCurrentPrice = () => Number(activeVariant.price) * quantity;
 
@@ -214,10 +301,9 @@ function useProduct() {
     activeVariant,
     getCurrentPrice,
     pvOptionList,
-    setActiveVariant,
-    setPVOptionList,
     quantity,
     setQuantity,
+    onOptionItemClicked,
   };
 }
 
